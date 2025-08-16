@@ -1,0 +1,58 @@
+/* src/index.css (Versi Final & Bersih) */
+
+html {
+  /* Memastikan scroll antar section tetap mulus */
+  scroll-behavior: smooth;
+}
+
+body {
+  /* Mencegah scroll horizontal yang tidak diinginkan */
+  overflow-x: hidden;
+
+  /* Menjaga konsistensi font */
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  /* Rendering font yang lebih halus */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Gaya Custom untuk Komponen --- */
+
+/* 1. Gaya untuk Navbar Hover (Underline) */
+.navbar-item.has-underline-hover {
+  transition: color 0.3s ease;
+}
+
+.navbar-item.has-underline-hover:hover {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+/* 2. Gaya untuk memastikan pop-up selalu di atas */
+.modal {
+  z-index: 1000 !important;
+}
+
+/* 3. Gaya untuk animasi jeda pop-up */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.delayed-popup {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-duration: 0.5s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
+
+/* 4. Gaya untuk menyembunyikan panah slider di mobile */
+@media (max-width: 767px) {
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none !important;
+  }
+}
+

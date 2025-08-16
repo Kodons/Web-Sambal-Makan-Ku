@@ -1,0 +1,33 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model PopupBanner {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String   @db.VarChar(255)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Produk {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  level       Int
+  imageUrl    String @db.VarChar(255)
+  description String @db.Text
+}
+
+model Testimoni {
+  id     Int    @id @default(autoincrement())
+  name   String
+  title  String
+  quote  String @db.Text
+  rating Int
+}

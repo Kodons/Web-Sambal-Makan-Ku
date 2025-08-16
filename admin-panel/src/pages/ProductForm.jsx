@@ -1,0 +1,168 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
+const BACKEND_URL = 'http://localhost:3001';
+
+const ProductForm = () => {
+    const [name, setName] = useState('');
+    const [level, setLevel] = useState(0);
+    const [description, setDescription] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // PERUBAHAN 1: Tambahkan state baru untuk URL preview sementara
+    const [previewUrl, setPreviewUrl] = useState('');
+
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const isEditing = id !== undefined;
+
+    // useEffect untuk mengambil data saat dalam mode edit (tidak berubah)
+    useEffect(() => {
+        if (isEditing) {
+            fetch(`${BACKEND_URL}/api/produk/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    setName(data.name);
+                    setLevel(data.level);
+                    setDescription(data.description);
+                    setImageUrl(data.imageUrl);
+                });
+        }
+    }, [id, isEditing]);
+
+    useEffect(() => {
+        // Jika tidak ada file yang dipilih, hapus preview
+        if (!selectedFile) {
+            setPreviewUrl('');
+            return;
+        }
+
+        // Buat URL objek sementara dari file yang dipilih
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreviewUrl(objectUrl);
+
+        // Cleanup function: Hapus object URL dari memori saat komponen unmount
+        // atau saat file baru dipilih. Ini penting untuk mencegah memory leak.
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [selectedFile]);
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        let finalImageUrl = imageUrl;
+
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const uploadRes = await fetch(`${BACKEND_URL}/api/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                const uploadData = await uploadRes.json();
+                finalImageUrl = uploadData.filePath;
+            } catch (error) {
+                toast.error("Gagal mengunggah gambar.");
+                setIsSubmitting(false);
+                return;
+            }
+        }
+
+        const productData = { name, level: parseInt(level), description, imageUrl: finalImageUrl };
+        const url = isEditing ? `${BACKEND_URL}/api/produk/${id}` : `${BACKEND_URL}/api/produk`;
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData),
+            });
+            toast.success(`Produk berhasil ${isEditing ? 'diperbarui' : 'dibuat'}!`);
+            navigate('/produk');
+        } catch (error) {
+            toast.error("Terjadi kesalahan saat menyimpan data produk.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <div>
+            <h1 className="title">{isEditing ? 'Edit Produk' : 'Tambah Produk Baru'}</h1>
+            <div className="box">
+                <form onSubmit={handleSubmit}>
+                    <div className="field">
+                        <label className="label">Nama Produk</label>
+                        <div className="control">
+                            <input className="input" type="text" value={name} onChange={e => setName(e.target.value)} required />
+                        </div>
+                    </div>
+
+                    <div className="field">
+                        <label className="label">Level Pedas</label>
+                        <div className="control">
+                            <input className="input" type="number" value={level} onChange={e => setLevel(e.target.value)} required />
+                        </div>
+                    </div>
+
+                    <div className="field">
+                        <label className="label">Deskripsi</label>
+                        <div className="control">
+                            <textarea className="textarea" value={description} onChange={e => setDescription(e.target.value)} required></textarea>
+                        </div>
+                    </div>
+
+                    <div className="field">
+                        <label className="label">Gambar Produk</label>
+                        {isEditing && imageUrl && (
+                            <div className="mb-4">
+                                <p>Preview:</p>
+                                {/* Jika ada previewUrl (file baru dipilih), tampilkan itu. */}
+                                {previewUrl ? (
+                                    <img src={previewUrl} alt="Preview" width="200" />
+                                ) : (
+                                    // Jika tidak, tapi dalam mode edit & ada imageUrl, tampilkan gambar lama
+                                    isEditing && imageUrl ? (
+                                        <img src={`${BACKEND_URL}${imageUrl}`} alt="Gambar saat ini" width="200" />
+                                    ) : (
+                                        // Jika tidak ada keduanya, tampilkan placeholder
+                                        <p className="has-text-grey">Tidak ada gambar yang dipilih.</p>
+                                    )
+                                )}
+                            </div>
+                        )}
+                        <div className="control">
+                            <input className="input" type="file" onChange={e => setSelectedFile(e.target.files[0])} />
+                        </div>
+                        <p className="help">{isEditing ? 'Pilih file baru untuk mengganti gambar di atas.' : 'Pilih file untuk diunggah.'}</p>
+                    </div>
+                    <div className="field is-grouped mt-5">
+                        <div className="control">
+                            <button type="submit" className={`button is-link ${isSubmitting ? 'is-loading' : ''}`} disabled={isSubmitting}>
+                                Simpan
+                            </button>
+                        </div>
+                        <div className="control">
+                            <button type="button" className="button is-link is-light" onClick={() => navigate('/produk')}>
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default ProductForm;

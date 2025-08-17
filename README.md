@@ -66,9 +66,9 @@ Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
 - Buat database baru dengan nama `sambal_db`.
 
 ### 2. Back-end API
-- Masuk ke folder `backend-sambal`:
+- Masuk ke folder `backend`:
   ```bash
-  cd backend-sambal
+  cd backend
   ```
 - Install semua dependensi:
   ```bash
@@ -86,7 +86,7 @@ Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
 - (Opsional) Isi beberapa data awal menggunakan phpMyAdmin.
 
 ### 3. Front-end (Landing Page)
-- Buka terminal baru, masuk ke folder `sambal-react-vite`:
+- Buka terminal baru, masuk ke folder `frontend`:
   ```bash
   cd frontend
   ```
@@ -115,14 +115,14 @@ Anda perlu menjalankan **tiga server** secara bersamaan di **tiga terminal terpi
 
 1.  **Jalankan Back-end Server:**
     ```bash
-    # Di dalam folder backend-sambal
+    # Di dalam folder backend
     npm run dev
     # Server akan berjalan di http://localhost:3001
     ```
 
 2.  **Jalankan Landing Page:**
     ```bash
-    # Di dalam folder sambal-react-vite
+    # Di dalam folder frontend
     npm run dev
     # Landing Page akan berjalan di http://localhost:5173
     ```
@@ -136,4 +136,6 @@ Anda perlu menjalankan **tiga server** secara bersamaan di **tiga terminal terpi
 
 Sekarang Anda bisa membuka URL Landing Page dan Admin Panel di browser Anda.
 
+**Note:**
+Untuk menampilkan pop-up, produk, dan testimoni tambahkan dibagian admin-panel
 ---

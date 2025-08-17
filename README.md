@@ -79,7 +79,7 @@ Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
   DATABASE_URL="mysql://root:@localhost:3306/sambal_db"
   ```
   *(Sesuaikan username, password, dan nama database Anda)*
-- Jalankan migrasi Prisma untuk membuat tabel di database:
+- Jalankan migrasi Prisma untuk membuat tabel di database, ini akan membuat database otomatis:
   ```bash
   npx prisma migrate dev
   ```

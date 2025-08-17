@@ -99,7 +99,16 @@ const ProductForm = () => {
                      <div className="field">
                         <label className="label">Level Pedas</label>
                         <div className="control">
-                           <input className="input" type="number" value={level} onChange={e => setLevel(e.target.value)} required />
+                            {/* PERUBAHAN: Tambahkan min="1" dan max="5" */}
+                            <input 
+                                className="input" 
+                                type="number" 
+                                value={level} 
+                                onChange={e => setLevel(e.target.value)} 
+                                min="1" 
+                                max="5" 
+                                required 
+                            />
                         </div>
                      </div>
                      <div className="field">

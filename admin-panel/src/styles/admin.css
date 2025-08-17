@@ -1,7 +1,93 @@
-.admin-body { background-color: #f5f7fa; }
-.sidebar { background-color: #2d3748; }
-.sidebar .menu-list a { color: #a0aec0; border-radius: 6px; margin: 0.25rem 0; transition: all 0.3s; }
-.sidebar .menu-list a:hover { background-color: #4a5568; color: #ffffff; }
-.sidebar .menu-list a.is-active { background-color: #4299e1; color: #ffffff; font-weight: 600; }
-.sidebar .menu-list .icon-text .icon { margin-right: 0.75rem; }
-.top-navbar { border-bottom: 1px solid #e2e8f0; }
+/* Variabel Warna untuk Tema Gelap */
+:root {
+  --bg-main: #1a202c;       /* Latar belakang utama konten */
+  --bg-sidebar: #2d3748;    /* Latar belakang sidebar */
+  --bg-card: #2d3748;       /* Latar belakang kartu/box */
+  --text-main: #e2e8f0;     /* Warna teks utama */
+  --text-secondary: #a0aec0; /* Warna teks sekunder (label, dll) */
+  --border-color: #4a5568;  /* Warna border */
+  --primary-color: #3182ce; /* Warna biru untuk tombol & link */
+  --danger-color: #e53e3e;  /* Warna merah untuk tombol hapus */
+}
+
+body, .admin-body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-main);
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  background-color: var(--bg-sidebar);
+}
+.sidebar .menu-label {
+  color: var(--text-secondary);
+}
+.sidebar .menu-list a {
+  color: var(--text-secondary);
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+.sidebar .menu-list a:hover {
+  background-color: var(--bg-main);
+  color: white;
+}
+.sidebar .menu-list a.is-active {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+}
+
+/* --- Override Komponen Bulma untuk Tema Gelap --- */
+
+/* Box / Card */
+.box, .card {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Tabel */
+.table {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+}
+.table thead th {
+  color: white;
+}
+.table tbody tr:hover {
+  background-color: #4a5568 !important;
+}
+.table.is-striped tbody tr:nth-child(even) {
+  background-color: #283141;
+}
+
+/* Form */
+.label {
+  color: var(--text-secondary);
+}
+.input, .textarea {
+  background-color: var(--bg-main);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+.input:focus, .textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.125em rgba(49, 130, 206, 0.25);
+}
+
+/* Judul */
+.title, .subtitle {
+  color: var(--text-main);
+}
+
+/* Tombol */
+.button.is-primary {
+  background-color: var(--primary-color);
+  border-color: transparent;
+}
+.button.is-danger {
+  background-color: var(--danger-color);
+}
+.button.is-info {
+    background-color: #3182ce;
+}

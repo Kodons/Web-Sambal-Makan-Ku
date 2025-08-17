@@ -1,7 +1,5 @@
 # Aplikasi Full-Stack Sambal Juara
 
-![Screenshot Landing Page](http://googleusercontent.com/404)
-
 Ini adalah proyek aplikasi web full-stack untuk "Sambal Juara", sebuah brand fiktif produk sambal. Aplikasi ini terdiri dari tiga bagian utama:
 1.  **Landing Page:** Halaman publik yang dinamis dan responsif untuk menampilkan produk kepada pelanggan.
 2.  **Back-end API:** Server Node.js yang terhubung ke database MySQL untuk menyediakan dan mengelola semua data.

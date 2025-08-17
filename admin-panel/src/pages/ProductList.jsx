@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { FaPepperHot } from 'react-icons/fa6';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -33,9 +34,9 @@ const ProductList = () => {
 
     return (
         <div>
-            <div className="level">
+            <div className="level mb-5">
                 <div className="level-left">
-                    <h1 className="title">Manajemen Produk</h1>
+                    <p className="subtitle is-5">Total {products.length} produk ditemukan</p>
                 </div>
                 <div className="level-right">
                     <Link to="/produk/baru" className="button is-primary">
@@ -43,7 +44,7 @@ const ProductList = () => {
                     </Link>
                 </div>
             </div>
-            
+
             <div className="box">
                 <table className="table is-fullwidth is-striped is-hoverable">
                     <thead>
@@ -59,7 +60,13 @@ const ProductList = () => {
                             <tr key={product.id}>
                                 <td>{product.id}</td>
                                 <td>{product.name}</td>
-                                <td>{product.level}</td>
+                                <td><div className="is-flex">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <span key={i} className="icon is-small">
+                                            <FaPepperHot className={i < product.level ? 'has-text-danger' : 'has-text-grey-lighter'} />
+                                        </span>
+                                    ))}
+                                </div></td>
                                 <td>
                                     <Link to={`/produk/edit/${product.id}`} className="button is-small is-info">
                                         Edit

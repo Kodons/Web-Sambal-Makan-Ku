@@ -28,7 +28,7 @@ const TestimoniForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        
+
         const testimoniData = { name, title, quote, rating: parseInt(rating) };
         const url = isEditing ? `http://localhost:3001/api/testimoni/${id}` : 'http://localhost:3001/api/testimoni';
         const method = isEditing ? 'PUT' : 'POST';
@@ -45,6 +45,13 @@ const TestimoniForm = () => {
             toast.error("Terjadi kesalahan saat menyimpan data.");
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleQuoteChange = (e) => {
+        // Hanya update state jika panjang teks tidak melebihi 50
+        if (e.target.value.length <= 50) {
+            setQuote(e.target.value);
         }
     };
 
@@ -70,8 +77,17 @@ const TestimoniForm = () => {
                     <div className="field">
                         <label className="label">Kutipan</label>
                         <div className="control">
-                            <textarea className="textarea" value={quote} onChange={e => setQuote(e.target.value)} required></textarea>
+                            {/* PERUBAHAN 2: Ganti onChange dan tambahkan maxLength */}
+                            <textarea
+                                className="textarea"
+                                value={quote}
+                                onChange={handleQuoteChange}
+                                maxLength="50"
+                                required
+                            ></textarea>
                         </div>
+                        {/* PERUBAHAN 3: Tambahkan penghitung karakter */}
+                        <p className="help has-text-right">{quote.length} / 50</p>
                     </div>
 
                     <div className="field">

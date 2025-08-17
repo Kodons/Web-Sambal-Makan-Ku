@@ -52,8 +52,8 @@ Proyek ini dibagi menjadi tiga folder utama di dalam satu repository:
 ```
 /
 ├── admin-panel/      # Proyek React untuk Admin Panel
-├── backend-sambal/   # Proyek Node.js untuk Back-end API
-└── sambal-react-vite/  # Proyek React untuk Landing Page utama
+├── backend/          # Proyek Node.js untuk Back-end API
+└── frontend/         # Proyek React untuk Landing Page utama
 └── README.md         # File ini
 ```
 
@@ -63,7 +63,6 @@ Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
 
 ### 1. Database
 - Buka **phpMyAdmin**.
-- Buat database baru dengan nama `sambal_db`.
 
 ### 2. Back-end API
 - Masuk ke folder `backend`:
@@ -136,6 +135,6 @@ Anda perlu menjalankan **tiga server** secara bersamaan di **tiga terminal terpi
 
 Sekarang Anda bisa membuka URL Landing Page dan Admin Panel di browser Anda.
 
-**Note:**
 Untuk menampilkan pop-up, produk, dan testimoni tambahkan dibagian admin-panel
+
 ---

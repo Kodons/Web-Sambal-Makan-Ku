@@ -37,6 +37,7 @@ const BannerForm = () => {
         const objectUrl = URL.createObjectURL(selectedFile);
         setPreviewUrl(objectUrl);
 
+        // Cleanup function untuk mencegah memory leak
         return () => URL.revokeObjectURL(objectUrl);
     }, [selectedFile]);
 

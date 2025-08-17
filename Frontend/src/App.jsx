@@ -8,6 +8,8 @@ import KontakSection from './components/KontakSection.jsx';
 import Footer from './components/Footer.jsx';
 import WelcomePopup from './components/WelcomePopup.jsx';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 function App() {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [popupImageUrl, setPopupImageUrl] = useState('');
@@ -15,24 +17,15 @@ function App() {
   useEffect(() => {
     async function fetchPopupData() {
       try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/popup-banner`);
+        const response = await fetch(`${BACKEND_URL}/api/popup-banner`);
         const data = await response.json();
-        
         if (data && data.imageUrl) {
-          const fullImageUrl = `${import.meta.env.VITE_BACKEND_URL}${data.imageUrl}`;
-          setPopupImageUrl(fullImageUrl);
-          setIsPopupVisible(true);
+          setPopupImageUrl(`${BACKEND_URL}${data.imageUrl}`);
         }
-      } catch (error) {
-        console.error("Gagal mengambil data pop-up:", error);
-      }
+      } catch (error) { console.error("Gagal mengambil data pop-up:", error); }
     }
-
-    // Kita gunakan versi sederhana tanpa localStorage untuk sementara
-    fetchPopupData(); 
-    
-    // PERUBAHAN 2: setTimeout dihapus
-    
+    fetchPopupData();
+    setIsPopupVisible(true);
   }, []);
 
   const handleClosePopup = () => {
@@ -41,10 +34,7 @@ function App() {
 
   return (
     <>
-      {/* PERUBAHAN 3: Video dihapus dari sini */}
-    
       {isPopupVisible && popupImageUrl && <WelcomePopup onClose={handleClosePopup} imageUrl={popupImageUrl} />}
-      
       <Navbar />
       <HeroSection />
       <KeunggulanSection />
@@ -55,5 +45,4 @@ function App() {
     </>
   );
 }
-
 export default App;

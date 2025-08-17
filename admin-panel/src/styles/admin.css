@@ -1,41 +1,7 @@
-/* Mengatur warna dasar halaman admin */
-.admin-body {
-  background-color: #f5f7fa; /* Warna abu-abu muda untuk area konten */
-}
-
-/* Sidebar Utama */
-.sidebar {
-  background-color: #2d3748; /* Warna abu-abu gelap seperti di contoh */
-  color: #a0aec0;
-}
-
-/* Menu di dalam sidebar */
-.sidebar .menu-list a {
-  color: #a0aec0; /* Warna teks menu */
-  border-radius: 6px;
-  margin: 0.25rem 0;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-/* Efek saat mouse hover di atas menu */
-.sidebar .menu-list a:hover {
-  background-color: #4a5568; /* Warna latar sedikit lebih terang */
-  color: #ffffff; /* Teks menjadi putih */
-}
-
-/* Gaya untuk menu yang sedang aktif */
-.sidebar .menu-list a.is-active {
-  background-color: #4299e1; /* Warna biru seperti di contoh */
-  color: #ffffff;
-  font-weight: 600;
-}
-
-/* Mengatur posisi ikon di menu */
-.sidebar .menu-list .icon-text .icon {
-  margin-right: 0.75rem;
-}
-
-/* Navbar Atas */
-.top-navbar {
-  border-bottom: 1px solid #e2e8f0;
-}
+.admin-body { background-color: #f5f7fa; }
+.sidebar { background-color: #2d3748; }
+.sidebar .menu-list a { color: #a0aec0; border-radius: 6px; margin: 0.25rem 0; transition: all 0.3s; }
+.sidebar .menu-list a:hover { background-color: #4a5568; color: #ffffff; }
+.sidebar .menu-list a.is-active { background-color: #4299e1; color: #ffffff; font-weight: 600; }
+.sidebar .menu-list .icon-text .icon { margin-right: 0.75rem; }
+.top-navbar { border-bottom: 1px solid #e2e8f0; }

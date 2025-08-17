@@ -88,7 +88,7 @@ Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
 ### 3. Front-end (Landing Page)
 - Buka terminal baru, masuk ke folder `sambal-react-vite`:
   ```bash
-  cd sambal-react-vite
+  cd frontend
   ```
 - Install semua dependensi:
   ```bash

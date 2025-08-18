@@ -21,7 +21,7 @@ model Produk {
   name        String @unique
   level       Int
   imageUrl    String @db.VarChar(255)
-  description String @db.Text
+  description String @db.VarChar(100)
 }
 
 model Testimoni {

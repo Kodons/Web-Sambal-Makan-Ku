@@ -21,11 +21,17 @@ function App() {
         const data = await response.json();
         if (data && data.imageUrl) {
           setPopupImageUrl(`${BACKEND_URL}${data.imageUrl}`);
+          setIsPopupVisible(true); // Tampilkan pop-up setelah gambar berhasil didapat
         }
-      } catch (error) { console.error("Gagal mengambil data pop-up:", error); }
+      } catch (error) {
+        console.error("Gagal mengambil data pop-up:", error);
+      }
     }
-    fetchPopupData();
-    setIsPopupVisible(true);
+
+    const hasBeenShown = localStorage.getItem('popupHasBeenShown');
+    if (!hasBeenShown) {
+      fetchPopupData();
+    }
   }, []);
 
   const handleClosePopup = () => {
@@ -33,16 +39,21 @@ function App() {
   };
 
   return (
-    <>
+    // PERUBAHAN: Hapus fragment (<>) yang tidak perlu
+    <div className='page-wrapper'>
       {isPopupVisible && popupImageUrl && <WelcomePopup onClose={handleClosePopup} imageUrl={popupImageUrl} />}
-      <Navbar />
-      <HeroSection />
-      <KeunggulanSection />
-      <ProdukSection />
-      <TestimoniSection />
-      <KontakSection />
+
+      <div className="content-wrap">
+        <Navbar />
+        <HeroSection />
+        <KeunggulanSection />
+        <ProdukSection />
+        <TestimoniSection />
+        <KontakSection />
+      </div>
       <Footer />
-    </>
+    </div>
   );
 }
+
 export default App;

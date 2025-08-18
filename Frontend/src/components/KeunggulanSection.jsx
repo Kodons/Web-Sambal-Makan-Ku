@@ -16,7 +16,7 @@ const KeunggulanSection = () => {
     const itemVariants = { hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }};
 
     return (
-        <section id="tentang" className="section is-medium is-flex is-flex-direction-column is-justify-content-center" style={{ minHeight: '100vh' }}>
+        <section id="tentang" className="section is-large">
             <div className="container has-text-centered">
                 <h2 className="title is-2">Kenapa Sambal Teman Ku?</h2>
                 <p className="subtitle is-5 has-text-grey mb-6">Enam pilar utama yang membuat kami istimewa.</p>

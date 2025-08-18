@@ -56,3 +56,85 @@ body {
   }
 }
 
+/* Mengatur warna link di dalam footer */
+.footer a:not(.button) {
+  color: #a0aec0; /* Warna abu-abu muda agar kontras dengan background gelap */
+  transition: color 0.3s ease;
+}
+
+/* Efek saat mouse hover di atas link */
+.footer a:not(.button):hover {
+  color: white; /* Warna link menjadi putih */
+}
+
+/* Mengatur warna garis pemisah di dalam footer */
+.footer hr {
+  background-color: #4a5568; 
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column; /* Menyusun item (content-wrap & footer) secara vertikal */
+  min-height: 100vh;      /* Memaksa tinggi wrapper minimal setinggi layar */
+}
+
+.content-wrap {
+  flex: 1; /* Memberitahu area konten untuk meregang dan mengambil semua sisa ruang kosong */
+}
+
+.product-pagination .pagination-link {
+  background-color: #c0392b; /* Selalu berwarna merah */
+  color: white;             /* Selalu berwarna putih */
+  border-color: #c0392b;    /* Garis tepi juga merah */
+  font-weight: bold;
+  transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out; /* Animasi hover */
+}
+
+/* Efek saat mouse hover di atas link (yang tidak aktif) */
+.product-pagination .pagination-link:not(.is-current):hover {
+  transform: scale(1.1); /* Sedikit membesar */
+  border-color: #c0392b; /* Pastikan border tetap merah */
+}
+
+/* Gaya untuk link yang sedang aktif */
+.product-pagination .pagination-link.is-current {
+  transform: scale(1.15); /* Sedikit lebih besar dari hover */
+  filter: brightness(90%); /* Sedikit lebih gelap untuk menandakan aktif */
+}
+
+/* Mengatur bentuk lingkaran (tetap sama) */
+.pagination-link,
+.pagination-previous,
+.pagination-next {
+  border-radius: 50% !important;
+}
+
+/* --- Gaya Baru untuk Membatasi Teks Deskripsi Produk --- */
+.description-truncate {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* Batasi teks hingga 3 baris */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  /* Tentukan tinggi minimum agar kartu yang deskripsinya pendek tetap sejajar */
+  /* Sesuaikan angka ini jika perlu, berdasarkan ukuran font Anda */
+  min-height: 60px; 
+}
+
+.testimonial-grid-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+  padding: 2rem;
+  height: 100%; /* Penting untuk menyamakan tinggi */
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.testimonial-grid-card .quote-text {
+  flex-grow: 1; /* Mendorong profil ke bawah */
+  font-style: italic;
+  color: #4a4a4a;
+}

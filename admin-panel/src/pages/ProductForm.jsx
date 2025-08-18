@@ -85,6 +85,12 @@ const ProductForm = () => {
         }
     };
 
+    const handleDescriptionChange = (e) => {
+        if (e.target.value.length <= 100) {
+            setDescription(e.target.value);
+        }
+    };
+
     return (
         <div>
             <h1 className="title">{isEditing ? 'Edit Produk' : 'Tambah Produk Baru'}</h1>
@@ -114,7 +120,14 @@ const ProductForm = () => {
                      <div className="field">
                         <label className="label">Deskripsi</label>
                         <div className="control">
-                           <textarea className="textarea" value={description} onChange={e => setDescription(e.target.value)} required></textarea>
+                           <textarea 
+                                className="textarea" 
+                                value={description} 
+                                onChange={handleDescriptionChange} 
+                                maxLength="100"
+                                required
+                            ></textarea>
+                            <p className="help has-text-right">{description.length} / 100</p>
                         </div>
                      </div>
                     

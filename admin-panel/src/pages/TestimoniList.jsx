@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 const TestimoniList = () => {
     const [testimonis, setTestimonis] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const testimonialsPerPage = 10;
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/testimoni')
+        setIsLoading(true);
+        fetch(`http://localhost:3001/api/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`)
             .then(res => res.json())
-            .then(data => {
-                setTestimonis(data);
+            .then(response => {
+                setTestimonis(response.data);
+                setTotalPages(Math.ceil(response.total / testimonialsPerPage));
                 setIsLoading(false);
             })
             .catch(() => {
                 toast.error("Gagal memuat data testimoni.");
                 setIsLoading(false);
             });
-    }, []);
+    }, [currentPage]);
 
     const handleDelete = async (id) => {
         if (window.confirm('Anda yakin ingin menghapus testimoni ini?')) {
@@ -43,7 +49,7 @@ const TestimoniList = () => {
                     </Link>
                 </div>
             </div>
-            
+
             <div className="box">
                 <table className="table is-fullwidth is-striped is-hoverable">
                     <thead>
@@ -74,6 +80,11 @@ const TestimoniList = () => {
                         ))}
                     </tbody>
                 </table>
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={page => setCurrentPage(page)}
+                />
             </div>
         </div>
     );

@@ -12,6 +12,7 @@ const ProductForm = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [harga, setHarga] = useState(0);
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditing = id !== undefined;
@@ -25,6 +26,7 @@ const ProductForm = () => {
                     setLevel(data.level);
                     setDescription(data.description);
                     setImageUrl(data.imageUrl);
+                    setHarga(data.harga);
                 });
         }
     }, [id, isEditing]);
@@ -66,7 +68,7 @@ const ProductForm = () => {
                 return;
             }
         }
-        const productData = { name, level: parseInt(level), description, imageUrl: finalImageUrl };
+        const productData = { name, level: parseInt(level), description, imageUrl: finalImageUrl, harga: parseInt(harga) };
         const url = isEditing ? `${BACKEND_URL}/api/produk/${id}` : `${BACKEND_URL}/api/produk`;
         const method = isEditing ? 'PUT' : 'POST';
         try {
@@ -105,7 +107,6 @@ const ProductForm = () => {
                      <div className="field">
                         <label className="label">Level Pedas</label>
                         <div className="control">
-                            {/* PERUBAHAN: Tambahkan min="1" dan max="5" */}
                             <input 
                                 className="input" 
                                 type="number" 
@@ -130,6 +131,13 @@ const ProductForm = () => {
                             <p className="help has-text-right">{description.length} / 100</p>
                         </div>
                      </div>
+
+                      <div className="field">
+                        <label className="label">Harga (Rupiah)</label>
+                        <div className="control">
+                            <input className="input" type="number" placeholder="Contoh: 25000" value={harga} onChange={e => setHarga(e.target.value)} required />
+                        </div>
+                    </div>
                     
                     <div className="field">
                         <label className="label">Gambar Produk</label>
@@ -137,13 +145,10 @@ const ProductForm = () => {
                         <div className="mb-4">
                             <p>Preview:</p>
                             {previewUrl ? (
-                                // Prioritas 1: Selalu tampilkan preview jika ada file baru yang dipilih
                                 <img src={previewUrl} alt="Preview" width="200" />
                             ) : isEditing && imageUrl ? (
-                                // Prioritas 2: Jika tidak, tampilkan gambar lama saat mode edit
                                 <img src={`${BACKEND_URL}${imageUrl}`} alt="Gambar saat ini" width="200" />
                             ) : (
-                                // Prioritas 3: Jika tidak ada keduanya, tampilkan placeholder
                                 <p className="has-text-grey">Tidak ada gambar yang dipilih.</p>
                             )}
                         </div>

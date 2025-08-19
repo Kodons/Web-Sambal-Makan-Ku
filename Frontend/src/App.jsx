@@ -3,6 +3,7 @@ import Navbar from './components/Navbar.jsx';
 import HeroSection from './components/HeroSection.jsx';
 import KeunggulanSection from './components/KeunggulanSection.jsx';
 import ProdukSection from './components/ProdukSection.jsx';
+import HowToOrder from './components/HowToOrder.jsx';
 import TestimoniSection from './components/TestimoniSection.jsx';
 import KontakSection from './components/KontakSection.jsx';
 import Footer from './components/Footer.jsx';
@@ -48,6 +49,7 @@ function App() {
         <HeroSection />
         <KeunggulanSection />
         <ProdukSection />
+        <HowToOrder />
         <TestimoniSection />
         <KontakSection />
       </div>

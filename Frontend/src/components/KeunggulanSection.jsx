@@ -33,7 +33,6 @@ const KeunggulanSection = () => {
                                 {feature.icon}
                             </span>
                             <h3 className="title is-4 mt-4">{feature.title}</h3>
-                            {/* PERUBAHAN: Kelas diubah menjadi is-size-5 */}
                             <p className="is-size-5">{feature.description}</p>
                         </motion.div>
                     ))}

@@ -22,6 +22,7 @@ model Produk {
   level       Int
   imageUrl    String @db.VarChar(255)
   description String @db.VarChar(100)
+  harga       Int
 }
 
 model Testimoni {

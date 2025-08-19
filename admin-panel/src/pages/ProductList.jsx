@@ -2,28 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaPepperHot } from 'react-icons/fa6';
+import Pagination from '../components/Pagination';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const productsPerPage = 10; 
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/produk')
+        setIsLoading(true);
+        fetch(`http://localhost:3001/api/produk?page=${currentPage}&limit=${productsPerPage}`)
             .then(res => res.json())
-            .then(data => {
-                setProducts(data);
+            .then(response => {
+                setProducts(response.data);
+                setTotalPages(Math.ceil(response.total / productsPerPage));
                 setIsLoading(false);
             })
             .catch(() => {
                 toast.error("Gagal memuat data produk.");
                 setIsLoading(false);
             });
-    }, []);
+    }, [currentPage]);
 
     const handleDelete = async (id) => {
         if (window.confirm('Anda yakin ingin menghapus produk ini?')) {
             await fetch(`http://localhost:3001/api/produk/${id}`, { method: 'DELETE' });
-            setProducts(products.filter(p => p.id !== id));
+            setCurrentPage(1);
             toast.success('Produk berhasil dihapus!');
         }
     };
@@ -52,6 +58,7 @@ const ProductList = () => {
                             <th>ID</th>
                             <th>Nama</th>
                             <th>Level Pedas</th>
+                            <th>Harga</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -68,6 +75,9 @@ const ProductList = () => {
                                     ))}
                                 </div></td>
                                 <td>
+                                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.harga)}
+                                </td>
+                                <td>
                                     <Link to={`/produk/edit/${product.id}`} className="button is-small is-info">
                                         Edit
                                     </Link>
@@ -80,6 +90,11 @@ const ProductList = () => {
                     </tbody>
                 </table>
             </div>
+            <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={page => setCurrentPage(page)}
+            />
         </div>
     );
 };

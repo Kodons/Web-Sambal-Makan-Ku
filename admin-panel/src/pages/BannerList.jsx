@@ -43,8 +43,8 @@ const BannerList = () => {
                             <td>
                                 <img src={`${BACKEND_URL}${banner.imageUrl}`} alt="Banner" width="150" />
                             </td>
-                            <td>{banner.isActive ? 
-                                <span className="tag is-success">Aktif</span> : 
+                            <td>{banner.isActive ?
+                                <span className="tag is-success">Aktif</span> :
                                 <span className="tag is-danger">Tidak Aktif</span>
                             }</td>
                             <td>

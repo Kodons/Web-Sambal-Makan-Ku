@@ -9,10 +9,7 @@ const BannerForm = () => {
     const [isActive, setIsActive] = useState(true);
     const [selectedFile, setSelectedFile] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // PERUBAHAN 1: Tambahkan state untuk URL preview
     const [previewUrl, setPreviewUrl] = useState('');
-
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditing = id !== undefined;
@@ -28,7 +25,6 @@ const BannerForm = () => {
         }
     }, [id, isEditing]);
 
-    // PERUBAHAN 2: Tambahkan useEffect untuk membuat & membersihkan URL preview
     useEffect(() => {
         if (!selectedFile) {
             setPreviewUrl('');
@@ -37,7 +33,6 @@ const BannerForm = () => {
         const objectUrl = URL.createObjectURL(selectedFile);
         setPreviewUrl(objectUrl);
 
-        // Cleanup function untuk mencegah memory leak
         return () => URL.revokeObjectURL(objectUrl);
     }, [selectedFile]);
 
@@ -95,8 +90,6 @@ const BannerForm = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="field">
                         <label className="label">Gambar Banner</label>
-                        
-                        {/* PERUBAHAN 3: Logika untuk menampilkan preview */}
                         <div className="mb-4">
                             <p>Preview:</p>
                             {previewUrl ? (

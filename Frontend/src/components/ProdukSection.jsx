@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaPepperHot } from 'react-icons/fa6';
 
-// Komponen terpisah untuk satu kartu produk (agar lebih rapi)
 const ProductCard = ({ product }) => (
     <motion.div
         key={product.id}
@@ -24,6 +23,9 @@ const ProductCard = ({ product }) => (
             <div className="card-content" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, textAlign: 'left' }}>
                 <p className="title is-5">{product.name}</p>
                 <p className="subtitle is-6">{product.description}</p>
+                <p className="title is-4 has-text-danger has-text-weight-bold mt-auto pt-4">
+                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.harga)}
+                </p>
             </div>
             <footer className="card-footer">
                 <div className="card-footer-item">
@@ -45,19 +47,22 @@ const ProductCard = ({ product }) => (
 
 
 const ProdukSection = () => {
-    const [allProducts, setAllProducts] = useState([]); // Menyimpan SEMUA produk
+    const [allProducts, setAllProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
-    // PERUBAHAN 1: Tambahkan state untuk pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 4; // Tampilkan 4 produk per halaman
+    const productsPerPage = 4;
 
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/produk`);
-                const data = await response.json();
-                setAllProducts(data);
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/produk?all=true`);
+                const responseData = await response.json();
+                if (responseData && Array.isArray(responseData.data)) {
+                    setAllProducts(responseData.data);
+                } else {
+                    setAllProducts(responseData);
+                }
+
             } catch (error) {
                 console.error("Gagal mengambil data produk:", error);
             } finally {
@@ -67,14 +72,10 @@ const ProdukSection = () => {
         fetchProducts();
     }, []);
 
-    // PERUBAHAN 2: Logika untuk memotong data sesuai halaman saat ini
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = allProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
     const totalPages = Math.ceil(allProducts.length / productsPerPage);
-
-    // Fungsi untuk ganti halaman
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     if (isLoading) {
@@ -95,13 +96,10 @@ const ProdukSection = () => {
                 {allProducts.length > 0 ? (
                     <>
                         <motion.div className="columns is-centered is-multiline">
-                            {/* Tampilkan hanya produk untuk halaman saat ini */}
                             {currentProducts.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
                         </motion.div>
-
-                        {/* PERUBAHAN 3: Tampilkan pagination jika halaman lebih dari 1 */}
                         {totalPages > 1 && (
                             <nav className="pagination is-centered is-rounded mt-6 product-pagination" role="navigation" aria-label="pagination">
                                 <ul className="pagination-list">

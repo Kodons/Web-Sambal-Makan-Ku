@@ -31,21 +31,77 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
 // --- API ENDPOINTS: PRODUK ---
 app.get('/api/produk', async (req, res) => {
-  const allProduk = await prisma.produk.findMany();
-  res.json(allProduk);
+  if (req.query.all === 'true') {
+    try {
+      const allProduk = await prisma.produk.findMany({ orderBy: { id: 'asc' } });
+      res.json(allProduk);
+    } catch (error) {
+      res.status(500).json({ error: 'Gagal mengambil semua data produk' });
+    }
+  } else {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    try {
+      const produk = await prisma.produk.findMany({
+        skip: skip,
+        take: limit,
+        orderBy: { id: 'asc' },
+      });
+      const totalProduk = await prisma.produk.count();
+      res.json({ data: produk, total: totalProduk });
+    } catch (error) {
+      res.status(500).json({ error: 'Gagal mengambil data produk' });
+    }
+  }
 });
+
 app.get('/api/produk/:id', async (req, res) => {
   const produk = await prisma.produk.findUnique({ where: { id: parseInt(req.params.id) } });
   res.json(produk);
 });
+
 app.post('/api/produk', async (req, res) => {
-  const newProduk = await prisma.produk.create({ data: req.body });
-  res.status(201).json(newProduk);
+  const { name, level, description, imageUrl, harga } = req.body;
+  try {
+    const newProduk = await prisma.produk.create({
+      data: {
+        name,
+        level: parseInt(level),
+        description,
+        imageUrl,
+        harga: parseInt(harga),
+      },
+    });
+    res.status(201).json(newProduk);
+  } catch (error) {
+    console.error("ERROR SAAT MEMBUAT PRODUK:", error);
+    res.status(500).json({ error: 'Gagal membuat produk baru' });
+  }
 });
+
 app.put('/api/produk/:id', async (req, res) => {
-  const updatedProduk = await prisma.produk.update({ where: { id: parseInt(req.params.id) }, data: req.body });
-  res.json(updatedProduk);
+  const { id } = req.params;
+  const { name, level, description, imageUrl, harga } = req.body;
+  try {
+    const updatedProduk = await prisma.produk.update({
+      where: { id: parseInt(id) },
+      data: {
+        name,
+        level: parseInt(level),
+        description,
+        imageUrl,
+        harga: parseInt(harga), // Diubah menjadi angka
+      },
+    });
+    res.json(updatedProduk);
+  } catch (error) {
+    console.error("ERROR SAAT MEMPERBARUI PRODUK:", error);
+    res.status(500).json({ error: 'Gagal memperbarui produk' });
+  }
 });
+
 app.delete('/api/produk/:id', async (req, res) => {
   await prisma.produk.delete({ where: { id: parseInt(req.params.id) } });
   res.status(204).send();
@@ -53,32 +109,58 @@ app.delete('/api/produk/:id', async (req, res) => {
 
 // --- API ENDPOINTS: TESTIMONI ---
 app.get('/api/testimoni', async (req, res) => {
-  const allTestimoni = await prisma.testimoni.findMany();
-  res.json(allTestimoni);
+  if (req.query.all === 'true') {
+    try {
+      const allTestimoni = await prisma.testimoni.findMany({ orderBy: { id: 'asc' } });
+      res.json({ data: allTestimoni, total: allTestimoni.length });
+    } catch (error) {
+      res.status(500).json({ error: 'Gagal mengambil semua data testimoni' });
+    }
+  } else {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    try {
+      const testimoni = await prisma.testimoni.findMany({
+        skip: skip,
+        take: limit,
+        orderBy: { id: 'asc' },
+      });
+      const totalTestimoni = await prisma.testimoni.count();
+      res.json({ data: testimoni, total: totalTestimoni });
+    } catch (error) {
+      res.status(500).json({ error: 'Gagal mengambil data testimoni' });
+    }
+  }
 });
+
 app.get('/api/testimoni/:id', async (req, res) => {
   const testimoni = await prisma.testimoni.findUnique({ where: { id: parseInt(req.params.id) } });
   res.json(testimoni);
 });
+
 app.post('/api/testimoni', async (req, res) => {
   const newTestimoni = await prisma.testimoni.create({ data: req.body });
   res.status(201).json(newTestimoni);
 });
+
 app.put('/api/testimoni/:id', async (req, res) => {
   const updatedTestimoni = await prisma.testimoni.update({ where: { id: parseInt(req.params.id) }, data: req.body });
   res.json(updatedTestimoni);
 });
+
 app.delete('/api/testimoni/:id', async (req, res) => {
   await prisma.testimoni.delete({ where: { id: parseInt(req.params.id) } });
   res.status(204).send();
 });
 
 // --- API ENDPOINTS: POPUP BANNER ---
-app.get('/api/popup-banner', async (req, res) => { // Untuk website utama
+app.get('/api/popup-banner', async (req, res) => {
   const banner = await prisma.popupBanner.findFirst({ where: { isActive: true } });
   res.json(banner);
 });
-app.get('/api/popup-banners', async (req, res) => { // Untuk admin panel
+app.get('/api/popup-banners', async (req, res) => {
   const allBanners = await prisma.popupBanner.findMany({ orderBy: { id: 'desc' } });
   res.json(allBanners);
 });

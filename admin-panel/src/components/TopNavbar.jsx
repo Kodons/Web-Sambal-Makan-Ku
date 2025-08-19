@@ -2,7 +2,6 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
 
-// Komponen sekarang menerima properti untuk mengontrol burger
 const TopNavbar = ({ isMobileMenuActive, onBurgerClick }) => {
     const location = useLocation();
     const pathnames = location.pathname.split('/').filter((x) => x);
@@ -14,12 +13,11 @@ const TopNavbar = ({ isMobileMenuActive, onBurgerClick }) => {
                     <a className="navbar-item has-text-weight-bold is-size-4" href="/produk">
                         Admin Panel
                     </a>
-                    {/* Tombol Burger Menu, hanya terlihat di mobile */}
                     <a
                         role="button"
                         className={`navbar-burger ${isMobileMenuActive ? 'is-active' : ''}`}
                         aria-label="menu"
-                        aria-expanded="false"
+                        aria-expanded={isMobileMenuActive}
                         onClick={onBurgerClick}
                     >
                         <span aria-hidden="true"></span>
@@ -28,7 +26,6 @@ const TopNavbar = ({ isMobileMenuActive, onBurgerClick }) => {
                     </a>
                 </div>
 
-                {/* Bagian ini hanya untuk desktop */}
                 <div className="navbar-menu">
                     <div className="navbar-start">
                         <div className="navbar-item">

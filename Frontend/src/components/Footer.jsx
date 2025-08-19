@@ -5,7 +5,6 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    // PERUBAHAN: Tambahkan kelas padding 'pt-6'
     <footer className="footer has-background-dark has-text-light pt-6">
       <div className="container">
         <div className="columns">
@@ -57,7 +56,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* PERUBAHAN: <hr /> dihapus dan div baru untuk copyright */}
         <div className="content has-text-centered pt-6 pb-2">
             <p className="is-size-7 has-text-grey-light">
                 &copy; {year} <strong>Sambal Teman Ku</strong>. All Rights Reserved.

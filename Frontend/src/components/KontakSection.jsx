@@ -17,7 +17,6 @@ const KontakSection = () => {
     const finalState = { opacity: 1, x: 0 };
 
     return (
-        // PERUBAHAN: Kelas diubah dari 'is-large' menjadi 'is-medium'
         <section
             id="kontak"
             className="section is-flex is-align-items-center is-justify-content-center"

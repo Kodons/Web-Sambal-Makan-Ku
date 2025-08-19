@@ -49,7 +49,6 @@ const TestimoniForm = () => {
     };
 
     const handleQuoteChange = (e) => {
-        // Hanya update state jika panjang teks tidak melebihi 50
         if (e.target.value.length <= 50) {
             setQuote(e.target.value);
         }
@@ -77,7 +76,6 @@ const TestimoniForm = () => {
                     <div className="field">
                         <label className="label">Kutipan</label>
                         <div className="control">
-                            {/* PERUBAHAN 2: Ganti onChange dan tambahkan maxLength */}
                             <textarea
                                 className="textarea"
                                 value={quote}
@@ -86,7 +84,6 @@ const TestimoniForm = () => {
                                 required
                             ></textarea>
                         </div>
-                        {/* PERUBAHAN 3: Tambahkan penghitung karakter */}
                         <p className="help has-text-right">{quote.length} / 50</p>
                     </div>
 

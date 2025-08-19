@@ -1,19 +1,17 @@
 import React from 'react';
 import useSWR from 'swr';
 import { Swiper, SwiperSlide } from 'swiper/react';
-// PERUBAHAN: Modul Grid tidak lagi diperlukan
-import { Navigation, Pagination, A11y, Autoplay } from 'swiper/modules';
+import { Grid, Navigation, Pagination, A11y, Autoplay } from 'swiper/modules';
 import { FaStar, FaUser } from 'react-icons/fa';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const TestimoniCard = ({ testimoni }) => (
-    // Komponen TestimoniCard tidak berubah, desainnya sudah bagus
     <div className="box testimonial-ktp-card">
         <article className="media">
             <figure className="media-left is-align-self-center">
                 <p className="image is-96x96 avatar-container">
-                    <FaUser size="3.5em" className="has-text-grey" />
+                    <FaUser size="3.5em" className="has-text-grey"/>
                 </p>
             </figure>
             <div className="media-content" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -37,42 +35,41 @@ const TestimoniCard = ({ testimoni }) => (
 );
 
 const TestimoniSection = () => {
-    const { data: testimonials = [], error, isLoading } = useSWR(
-        `${import.meta.env.VITE_BACKEND_URL}/api/testimoni`,
+    const { data: responseData, error, isLoading } = useSWR(
+        `${import.meta.env.VITE_BACKEND_URL}/api/testimoni?all=true`,
         fetcher
     );
 
     const renderContent = () => {
         if (isLoading) return <p>Memuat testimoni...</p>;
         if (error) return <p>Terjadi kesalahan saat memuat data.</p>;
+
+        const testimonials = responseData ? responseData.data : [];
+
         if (testimonials.length === 0) {
-            return <p className="subtitle is-5 has-text-grey">Belum ada testimoni dari pelanggan.</p>;
+            return <p className="subtitle is-5 has-text-grey has-text-centered">Belum ada testimoni dari pelanggan.</p>;
         }
-        
+
         return (
-            // PERUBAHAN UTAMA: Konfigurasi Swiper kembali ke mode slider satu baris
             <Swiper
-                modules={[Navigation, Pagination, A11y, Autoplay]}
+                modules={[Grid, Navigation, Pagination, A11y, Autoplay]}
+                slidesPerView={3}
+                slidesPerGroup={3}
+                grid={{
+                    rows: 2,
+                    fill: 'row',
+                }}
                 spaceBetween={30}
-                slidesPerView={1} // Tampil 1 di mobile
-                slidesPerGroup={1}
-                loop={testimonials.length > 3} // Loop jika data cukup banyak
                 pagination={{ clickable: true }}
                 navigation={true}
                 autoplay={{ delay: 5000, disableOnInteraction: false }}
-                className="testimonial-swiper" // Ganti nama kelas agar lebih umum
+                className="testimonial-swiper-grid"
+
                 breakpoints={{
-                    // 2 kartu per slide di tablet
-                    768: {
-                      slidesPerView: 2,
-                      slidesPerGroup: 2,
-                    },
-                    // 3 kartu per slide di desktop
-                    1024: {
-                      slidesPerView: 3,
-                      slidesPerGroup: 3,
-                    },
-                  }}
+                    320: { slidesPerView: 1, slidesPerGroup: 1, grid: { rows: 1 } },
+                    768: { slidesPerView: 2, slidesPerGroup: 2, grid: { rows: 2 } },
+                    1024: { slidesPerView: 3, slidesPerGroup: 3, grid: { rows: 2 } },
+                }}
             >
                 {testimonials.map((testimoni) => (
                     <SwiperSlide key={testimoni.id}>

@@ -1,9 +1,7 @@
 // src/main.jsx
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-
 
 // Penting! Impor file CSS Bulma di sini
 import 'bulma/css/bulma.min.css' 
@@ -11,6 +9,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade'; 
+import 'swiper/css/grid';
 
 // Impor file CSS kustom Anda (setelah Bulma)
 import './index.css'

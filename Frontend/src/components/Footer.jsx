@@ -33,8 +33,8 @@ const Footer = () => {
           <div className="column is-2">
             <h6 className="title is-5 has-text-white">Navigasi</h6>
             <ul>
+              <li><a href="#tentang">Tentang Kami</a></li>
               <li><a href="#produk">Produk</a></li>
-              <li><a href="#tentang">Keunggulan</a></li>
               <li><a href="#testimoni">Testimoni</a></li>
               <li><a href="#kontak">Kontak</a></li>
             </ul>

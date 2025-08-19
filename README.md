@@ -52,8 +52,8 @@ Proyek ini dibagi menjadi tiga folder utama di dalam satu repository:
 ```
 /
 ├── admin-panel/      # Proyek React untuk Admin Panel
-├── backend-sambal/   # Proyek Node.js untuk Back-end API
-└── sambal-react-vite/  # Proyek React untuk Landing Page utama
+├── backend/          # Proyek Node.js untuk Back-end API
+└── frontend/         # Proyek React untuk Landing Page utama
 └── README.md         # File ini
 ```
 
@@ -63,12 +63,11 @@ Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
 
 ### 1. Database
 - Buka **phpMyAdmin**.
-- Buat database baru dengan nama `sambal_db`.
 
 ### 2. Back-end API
-- Masuk ke folder `backend-sambal`:
+- Masuk ke folder `backend`:
   ```bash
-  cd backend-sambal
+  cd backend
   ```
 - Install semua dependensi:
   ```bash
@@ -79,16 +78,16 @@ Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
   DATABASE_URL="mysql://root:@localhost:3306/sambal_db"
   ```
   *(Sesuaikan username, password, dan nama database Anda)*
-- Jalankan migrasi Prisma untuk membuat tabel di database:
+- Jalankan migrasi Prisma untuk membuat tabel di database, ini akan membuat database otomatis:
   ```bash
   npx prisma migrate dev
   ```
 - (Opsional) Isi beberapa data awal menggunakan phpMyAdmin.
 
 ### 3. Front-end (Landing Page)
-- Buka terminal baru, masuk ke folder `sambal-react-vite`:
+- Buka terminal baru, masuk ke folder `frontend`:
   ```bash
-  cd sambal-react-vite
+  cd frontend
   ```
 - Install semua dependensi:
   ```bash
@@ -115,14 +114,14 @@ Anda perlu menjalankan **tiga server** secara bersamaan di **tiga terminal terpi
 
 1.  **Jalankan Back-end Server:**
     ```bash
-    # Di dalam folder backend-sambal
+    # Di dalam folder backend
     npm run dev
     # Server akan berjalan di http://localhost:3001
     ```
 
 2.  **Jalankan Landing Page:**
     ```bash
-    # Di dalam folder sambal-react-vite
+    # Di dalam folder frontend
     npm run dev
     # Landing Page akan berjalan di http://localhost:5173
     ```
@@ -135,5 +134,7 @@ Anda perlu menjalankan **tiga server** secara bersamaan di **tiga terminal terpi
     ```
 
 Sekarang Anda bisa membuka URL Landing Page dan Admin Panel di browser Anda.
+
+Untuk menampilkan pop-up, produk, dan testimoni tambahkan dibagian admin-panel
 
 ---

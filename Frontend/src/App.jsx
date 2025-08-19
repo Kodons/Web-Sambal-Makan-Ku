@@ -21,7 +21,7 @@ function App() {
         const data = await response.json();
         if (data && data.imageUrl) {
           setPopupImageUrl(`${BACKEND_URL}${data.imageUrl}`);
-          setIsPopupVisible(true); // Tampilkan pop-up setelah gambar berhasil didapat
+          setIsPopupVisible(true);
         }
       } catch (error) {
         console.error("Gagal mengambil data pop-up:", error);
@@ -39,7 +39,7 @@ function App() {
   };
 
   return (
-    // PERUBAHAN: Hapus fragment (<>) yang tidak perlu
+
     <div className='page-wrapper'>
       {isPopupVisible && popupImageUrl && <WelcomePopup onClose={handleClosePopup} imageUrl={popupImageUrl} />}
 

@@ -1,45 +1,100 @@
-/* src/index.css (Versi Final & Bersih) */
-
 html {
-  /* Memastikan scroll antar section tetap mulus */
   scroll-behavior: smooth;
 }
 
 body {
-  /* Mencegah scroll horizontal yang tidak diinginkan */
   overflow-x: hidden;
-
-  /* Menjaga konsistensi font */
   font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  
-  /* Rendering font yang lebih halus */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Gaya Custom untuk Komponen --- */
-
-/* 1. Gaya untuk Navbar Hover (Underline) */
-.navbar-item.has-underline-hover {
-  transition: color 0.3s ease;
+/* ==========================================================================
+   Struktur Layout Utama (Sticky Footer)
+   ========================================================================== */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.navbar-item.has-underline-hover:hover {
-  text-decoration: underline;
-  text-underline-offset: 6px;
+.content-wrap {
+  flex: 1;
 }
 
-/* 2. Gaya untuk memastikan pop-up selalu di atas */
+/* ==========================================================================
+   Gaya Komponen Spesifik
+   ========================================================================== */
+
+/* --- Navbar --- */
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.navbar-pill {
+  max-width: 960px;
+  margin: 0 auto;
+  border-radius: 9999px;
+  background-color: rgba(20, 20, 20, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  pointer-events: auto;
+}
+
+.navbar-pill.is-scrolled {
+  max-width: 100%;
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.navbar-pill .navbar-item,
+.navbar-pill .navbar-burger span {
+  color: white;
+}
+.navbar-pill.is-scrolled .navbar-item,
+.navbar-pill.is-scrolled .navbar-burger span {
+  color: #4a4a4a;
+}
+
+.navbar-pill .navbar-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  color: white;
+}
+.navbar-pill.is-scrolled .navbar-item:hover {
+  background-color: #f5f5f5;
+  color: #c0392b;
+}
+
+.navbar-pill a.navbar-item.brand-logo:hover {
+  background-color: transparent !important;
+}
+
+@media (max-width: 1023px) {
+  .navbar-pill {
+    max-width: 100%;
+    border-radius: 0;
+  }
+}
+
+
+/* --- Pop-up (Modal) --- */
 .modal {
   z-index: 1000 !important;
 }
-
-/* 3. Gaya untuk animasi jeda pop-up */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 .delayed-popup {
   opacity: 0;
   animation-name: fadeIn;
@@ -48,7 +103,53 @@ body {
   animation-fill-mode: forwards;
 }
 
-/* 4. Gaya untuk menyembunyikan panah slider di mobile */
+/* --- Section Produk --- */
+.description-truncate {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 60px;
+}
+
+/* --- Section Testimoni (Slider) --- */
+/* Mengatur tinggi tetap slider di mobile agar tidak "goyang" */
+@media (max-width: 767px) {
+  .testimonial-swiper {
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.testimonial-swiper .swiper-wrapper {
+  /* (1) Pastikan barisan slide diatur untuk meregang */
+  align-items: stretch;
+}
+
+.testimonial-swiper .swiper-slide {
+  /* (2) Biarkan tinggi slide otomatis & jadikan flex container */
+  height: auto;
+  display: flex;
+}
+
+.testimonial-swiper .swiper-slide > .box {
+  /* (3) Paksa kartu (.box) untuk tumbuh mengisi seluruh tinggi slide */
+  width: 100%;
+  flex-grow: 1;
+}
+
+/* Mengubah warna panah & titik navigasi Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #c0392b !important;
+}
+.swiper-pagination-bullet-active {
+  background-color: #c0392b !important;
+}
+
+/* Menyembunyikan panah di mobile */
 @media (max-width: 767px) {
   .swiper-button-next,
   .swiper-button-prev {
@@ -56,85 +157,15 @@ body {
   }
 }
 
-/* Mengatur warna link di dalam footer */
+
+/* --- Footer --- */
 .footer a:not(.button) {
-  color: #a0aec0; /* Warna abu-abu muda agar kontras dengan background gelap */
+  color: #a0aec0;
   transition: color 0.3s ease;
 }
-
-/* Efek saat mouse hover di atas link */
 .footer a:not(.button):hover {
-  color: white; /* Warna link menjadi putih */
+  color: white;
 }
-
-/* Mengatur warna garis pemisah di dalam footer */
 .footer hr {
-  background-color: #4a5568; 
-}
-
-.page-wrapper {
-  display: flex;
-  flex-direction: column; /* Menyusun item (content-wrap & footer) secara vertikal */
-  min-height: 100vh;      /* Memaksa tinggi wrapper minimal setinggi layar */
-}
-
-.content-wrap {
-  flex: 1; /* Memberitahu area konten untuk meregang dan mengambil semua sisa ruang kosong */
-}
-
-.product-pagination .pagination-link {
-  background-color: #c0392b; /* Selalu berwarna merah */
-  color: white;             /* Selalu berwarna putih */
-  border-color: #c0392b;    /* Garis tepi juga merah */
-  font-weight: bold;
-  transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out; /* Animasi hover */
-}
-
-/* Efek saat mouse hover di atas link (yang tidak aktif) */
-.product-pagination .pagination-link:not(.is-current):hover {
-  transform: scale(1.1); /* Sedikit membesar */
-  border-color: #c0392b; /* Pastikan border tetap merah */
-}
-
-/* Gaya untuk link yang sedang aktif */
-.product-pagination .pagination-link.is-current {
-  transform: scale(1.15); /* Sedikit lebih besar dari hover */
-  filter: brightness(90%); /* Sedikit lebih gelap untuk menandakan aktif */
-}
-
-/* Mengatur bentuk lingkaran (tetap sama) */
-.pagination-link,
-.pagination-previous,
-.pagination-next {
-  border-radius: 50% !important;
-}
-
-/* --- Gaya Baru untuk Membatasi Teks Deskripsi Produk --- */
-.description-truncate {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3; /* Batasi teks hingga 3 baris */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  
-  /* Tentukan tinggi minimum agar kartu yang deskripsinya pendek tetap sejajar */
-  /* Sesuaikan angka ini jika perlu, berdasarkan ukuran font Anda */
-  min-height: 60px; 
-}
-
-.testimonial-grid-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-  padding: 2rem;
-  height: 100%; /* Penting untuk menyamakan tinggi */
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.testimonial-grid-card .quote-text {
-  flex-grow: 1; /* Mendorong profil ke bawah */
-  font-style: italic;
-  color: #4a4a4a;
+  background-color: #4a5568;
 }

@@ -1,11 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Komponen ini menerima 2 props:
-// 1. onClose: fungsi untuk menutup pop-up
-// 2. imageUrl: URL gambar yang akan ditampilkan
 const WelcomePopup = ({ onClose, imageUrl }) => {
-  // Jika karena suatu alasan gambar gagal dimuat dari backend, jangan tampilkan apa-apa
+
   if (!imageUrl) {
     return null; 
   }
@@ -26,7 +23,7 @@ const WelcomePopup = ({ onClose, imageUrl }) => {
             <section className="modal-card-body p-0">
                 <figure className="image">
                     <img 
-                        src={imageUrl} // src sekarang dinamis dari props
+                        src={imageUrl}
                         alt="Promo Sambal Juara" 
                         onClick={onClose}
                         style={{ cursor: 'pointer' }}
@@ -36,7 +33,7 @@ const WelcomePopup = ({ onClose, imageUrl }) => {
         </motion.div>
 
         <button 
-          className="modal-close is-large" 
+          className="modal-close is-large delete is-medium" 
           aria-label="close" 
           onClick={onClose}
         ></button>

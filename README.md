@@ -1,140 +1,195 @@
-# Aplikasi Full-Stack Sambal Teman Makan Ku
+Aplikasi Full-Stack Sambal  Teman Makan Ku
+Ini adalah proyek aplikasi web full-stack untuk "Sambal Teman Makan Ku", sebuah brand lokal produk sambal. Aplikasi ini terdiri dari tiga bagian utama yang bekerja secara terpisah:
 
-Ini adalah proyek aplikasi web full-stack untuk "Sambal Teman Makan Ku", sebuah brand fiktif produk sambal. Aplikasi ini terdiri dari tiga bagian utama:
-1.  **Landing Page:** Halaman publik yang dinamis dan responsif untuk menampilkan produk kepada pelanggan.
-2.  **Back-end API:** Server Node.js yang terhubung ke database MySQL untuk menyediakan dan mengelola semua data.
-3.  **Admin Panel:** Dasbor internal untuk admin guna mengelola konten website (Produk, Testimoni, Banner) tanpa menyentuh kode.
+Landing Page: Halaman publik yang dinamis dan responsif untuk menampilkan produk kepada pelanggan.
 
-## ✨ Fitur Utama
+Back-end API: Server Node.js yang terhubung ke database MySQL untuk menyediakan dan mengelola semua data.
 
-### Landing Page
-- **Desain Modern & Responsif:** Tampilan yang menyesuaikan di berbagai perangkat, dari desktop hingga mobile.
-- **Konten Dinamis:** Semua konten (produk, testimoni, banner) diambil langsung dari database melalui API.
-- **Animasi Interaktif:** Menggunakan Framer Motion untuk animasi yang halus dan Swiper.js untuk slider testimoni.
-- **Background Video:** Latar belakang video yang menarik di bagian hero.
-- **Pop-up Promosi:** Banner pop-up yang kontennya bisa diatur oleh admin.
+Admin Panel: Dasbor internal yang aman untuk admin guna mengelola konten website (Produk, Testimoni, Banner, Pengaturan) tanpa menyentuh kode.
 
-### Admin Panel
-- **Manajemen Konten (CRUD):** Fungsionalitas penuh untuk Create, Read, Update, dan Delete data Produk, Testimoni, dan Banner.
-- **Upload Gambar:** Fitur upload gambar yang mudah digunakan dengan preview instan.
-- **UI Bersih:** Tampilan dasbor yang rapi dan fungsional menggunakan framework Bulma.
-- **Notifikasi Interaktif:** Feedback visual (notifikasi *toast*) untuk setiap aksi yang berhasil atau gagal.
+✨ Fitur Utama
+Landing Page
+Desain Modern & Responsif: Tampilan yang menyesuaikan di berbagai perangkat, dari desktop hingga mobile.
 
-### Back-end
-- **REST API:** Dibangun dengan Node.js dan Express.js.
-- **ORM Modern:** Menggunakan Prisma untuk interaksi yang aman dan efisien dengan database.
-- **Database:** Terhubung dengan MySQL.
-- **Upload File:** Menggunakan Multer untuk menangani upload gambar.
+Konten Dinamis: Semua konten (produk, testimoni, banner, logo, link sosmed) diambil langsung dari database melalui API.
 
-## 🛠️ Tumpukan Teknologi (Tech Stack)
+Animasi Interaktif: Menggunakan Framer Motion untuk animasi yang halus dan Swiper.js untuk slider testimoni.
 
-- **Front-end (Landing Page & Admin Panel):**
-  - [React](https://reactjs.org/)
-  - [Vite](https://vitejs.dev/)
-  - [Bulma](https://bulma.io/) (Framework CSS)
-  - [Swiper.js](https://swiperjs.com/) (Slider)
-  - [Framer Motion](https://www.framer.com/motion/) (Animasi)
-  - [React Router DOM](https://reactrouter.com/) (Routing Admin Panel)
-  - [React Hot Toast](https://react-hot-toast.com/) (Notifikasi)
-- **Back-end:**
-  - [Node.js](https://nodejs.org/)
-  - [Express.js](https://expressjs.com/)
-  - [Prisma](https://www.prisma.io/) (ORM)
-  - [Multer](https://github.com/expressjs/multer) (File Upload)
-  - [CORS](https://www.npmjs.com/package/cors)
-- **Database:**
-  - [MySQL](https://www.mysql.com/)
+Background Video: Latar belakang video yang menarik di bagian hero.
 
-## 📂 Struktur Proyek
+Pop-up Promosi: Banner pop-up yang kontennya bisa diatur oleh admin.
 
+Admin Panel
+Otentikasi Aman: Sistem login berbasis JWT (JSON Web Token) untuk melindungi semua halaman admin.
+
+Manajemen Konten (CRUD): Fungsionalitas penuh untuk Create, Read, Update, dan Delete data.
+
+Pengelolaan Dinamis:
+
+Produk: Mengatur nama, gambar, deskripsi, harga, dan level pedas.
+
+Testimoni: Menambah, mengubah, dan menghapus ulasan pelanggan.
+
+Banner Promosi: Mengontrol gambar pop-up yang tampil di landing page.
+
+Pengaturan Website: Mengubah nama brand, logo, dan menambah/menghapus link sosial media secara dinamis.
+
+Upload Gambar: Fitur upload gambar yang mudah digunakan dengan preview instan.
+
+UI Bersih & Interaktif: Tampilan dasbor yang rapi menggunakan Bulma, dengan notifikasi toast dan loading indicator.
+
+Back-end
+REST API: Dibangun dengan Node.js dan Express.js, dengan pemisahan rute publik dan rute admin yang aman.
+
+ORM Modern: Menggunakan Prisma untuk interaksi yang aman dan efisien dengan database.
+
+Database: Terhubung dengan MySQL.
+
+Upload File: Menggunakan Multer untuk menangani upload gambar.
+
+🛠️ Tumpukan Teknologi (Tech Stack)
+Front-end (Landing Page & Admin Panel):
+
+React
+
+Vite
+
+Bulma (Framework CSS)
+
+Swiper.js (Slider)
+
+Framer Motion (Animasi)
+
+React Router DOM (Routing Admin Panel)
+
+React Hot Toast (Notifikasi)
+
+SWR (Data Fetching)
+
+Back-end:
+
+Node.js
+
+Express.js
+
+Prisma (ORM)
+
+Multer (File Upload)
+
+bcryptjs & jsonwebtoken (Keamanan)
+
+Database:
+
+MySQL
+
+📂 Struktur Proyek
 Proyek ini dibagi menjadi tiga folder utama di dalam satu repository:
 
-```
 /
-├── admin-panel/      # Proyek React untuk Admin Panel
-├── backend/          # Proyek Node.js untuk Back-end API
-└── frontend/         # Proyek React untuk Landing Page utama
-└── README.md         # File ini
-```
+├── admin-panel/        # Proyek React untuk Admin Panel
+├── backend-sambal/     # Proyek Node.js untuk Back-end API
+└── sambal-react-vite/  # Proyek React untuk Landing Page utama
+└── README.md           # File ini
 
-## 🚀 Instalasi & Setup
+🚀 Instalasi & Setup
+Ikuti langkah-langkah ini secara berurutan untuk menjalankan proyek secara lokal.
 
-Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal.
+Langkah 1: Clone Repository
+Clone (unduh) kode dari GitHub dan masuk ke dalam foldernya.
 
-### 1. Database
-- Buka **phpMyAdmin**.
+git clone https://github.com/USERNAME/NAMA_REPO.git
+cd NAMA_REPO
 
-### 2. Back-end API
-- Masuk ke folder `backend`:
-  ```bash
-  cd backend
-  ```
-- Install semua dependensi:
-  ```bash
-  npm install
-  ```
-- Buat file `.env` dan salin dari `.env.example` (jika ada) atau isi dengan format berikut:
-  ```env
-  DATABASE_URL="mysql://root:@localhost:3306/sambal_db"
-  ```
-  *(Sesuaikan username, password, dan nama database Anda)*
-- Jalankan migrasi Prisma untuk membuat tabel di database, ini akan membuat database otomatis:
-  ```bash
-  npx prisma migrate dev
-  ```
-- (Opsional) Isi beberapa data awal menggunakan phpMyAdmin.
+Langkah 2: Setup Database
+Buka phpMyAdmin.
 
-### 3. Front-end (Landing Page)
-- Buka terminal baru, masuk ke folder `frontend`:
-  ```bash
-  cd frontend
-  ```
-- Install semua dependensi:
-  ```bash
-  npm install
-  ```
-- Buat file `.env` di direktori utama folder ini dan isi dengan alamat back-end:
-  ```env
-  VITE_BACKEND_URL=http://localhost:3001
-  ```
+Buat database baru dengan nama sambal_db.
 
-### 4. Front-end (Admin Panel)
-- Buka terminal baru, masuk ke folder `admin-panel`:
-  ```bash
-  cd admin-panel
-  ```
-- Install semua dependensi:
-  ```bash
-  npm install
-  ```
+Pastikan collation diatur ke utf8mb4_unicode_ci untuk dukungan karakter terbaik.
 
-## ▶️ Menjalankan Aplikasi
+Langkah 3: Konfigurasi Back-end API
+Buka Terminal Pertama, lalu masuk ke folder back-end:
 
-Anda perlu menjalankan **tiga server** secara bersamaan di **tiga terminal terpisah**.
+cd backend-sambal
 
-1.  **Jalankan Back-end Server:**
-    ```bash
-    # Di dalam folder backend
-    npm run dev
-    # Server akan berjalan di http://localhost:3001
-    ```
+Install semua dependensi:
 
-2.  **Jalankan Landing Page:**
-    ```bash
-    # Di dalam folder frontend
-    npm run dev
-    # Landing Page akan berjalan di http://localhost:5173
-    ```
+npm install
 
-3.  **Jalankan Admin Panel:**
-    ```bash
-    # Di dalam folder admin-panel
-    npm run dev
-    # Admin Panel akan berjalan di http://localhost:5174 (atau port lain)
-    ```
+Buat file .env dari contoh. Cukup salin .env.example (jika ada) atau buat file baru bernama .env dan isi dengan format berikut:
 
-Sekarang Anda bisa membuka URL Landing Page dan Admin Panel di browser Anda.
+# backend-sambal/.env
+DATABASE_URL="mysql://root:@localhost:3306/sambal_db"
+JWT_SECRET="ganti_dengan_kunci_rahasia_acak_yang_sangat_panjang"
 
-Untuk menampilkan pop-up, produk, dan testimoni tambahkan dibagian admin-panel
+(Sesuaikan username, password, dan JWT_SECRET Anda)
 
----
+Jalankan migrasi Prisma untuk membuat semua tabel secara otomatis:
+
+npx prisma migrate dev
+
+Langkah 4: Konfigurasi Front-end (Landing Page)
+Buka Terminal Kedua, lalu masuk ke folder landing page:
+
+cd sambal-react-vite
+
+Install dependensi:
+
+npm install
+
+Buat file baru bernama .env dan isi dengan:
+
+# sambal-react-vite/.env
+VITE_BACKEND_URL=http://localhost:3001
+
+Langkah 5: Konfigurasi Front-end (Admin Panel)
+Buka Terminal Ketiga, lalu masuk ke folder admin panel:
+
+cd admin-panel
+
+Install dependensi:
+
+npm install
+
+Buat file baru bernama .env dan isi dengan:
+
+# admin-panel/.env
+VITE_BACKEND_URL=http://localhost:3001
+
+▶️ Menjalankan Aplikasi & Setup Admin
+Langkah 1: Jalankan Semua Server
+Anda perlu menjalankan tiga server secara bersamaan di tiga terminal yang sudah Anda siapkan.
+
+Di Terminal 1 (Back-end):
+
+npm run dev
+# Server API akan berjalan di http://localhost:3001
+
+Di Terminal 2 (Landing Page):
+
+npm run dev
+# Landing Page akan berjalan di http://localhost:5173
+
+Di Terminal 3 (Admin Panel):
+
+npm run dev
+# Admin Panel akan berjalan di http://localhost:5174
+
+Langkah 2: Membuat Akun Admin Pertama (Penting!)
+Setelah back-end berjalan, Anda harus membuat akun admin pertama agar bisa login.
+
+Gunakan aplikasi API client seperti Postman atau Insomnia.
+
+Kirim request POST ke http://localhost:3001/api/register.
+
+Kirim dengan body JSON sebagai berikut:
+
+{
+    "username": "admin",
+    "password": "password_aman_anda"
+}
+
+Setelah request berhasil, Anda sekarang bisa login ke Admin Panel di http://localhost:5174 menggunakan kredensial tersebut.
+
+📄 Lisensi
+Proyek ini dilisensikan di bawah Lisensi MIT.

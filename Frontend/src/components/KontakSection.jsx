@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaWhatsapp, FaInstagram } from 'react-icons/fa';
+import useSWR from 'swr';
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const KontakSection = () => {
     const [isMobile, setIsMobile] = useState(false);
+
+    const { data: socialLinks = [] } = useSWR(
+        `${import.meta.env.VITE_BACKEND_URL}/api/social-media-links`,
+        fetcher
+    );
+
+    const whatsappLink = socialLinks.find(link => link.platform === 'WhatsApp');
+    const instagramLink = socialLinks.find(link => link.platform === 'Instagram');
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -56,18 +67,24 @@ const KontakSection = () => {
                             transition={{ duration: 0.8, delay: 0.2 }}
                         >
                             <h3 className="title is-4">Hubungi kami melalui:</h3>
-                            <div className="buttons is-centered">
-                                <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" className="button is-success is-large">
-                                    <span className="icon"><FaWhatsapp /></span>
-                                    <span>WhatsApp</span>
-                                </a>
-                            </div>
-                            <div className="buttons is-centered">
-                                <a href="https://instagram.com/namaproduk" target="_blank" rel="noopener noreferrer" className="button is-danger is-large" style={{ background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', borderColor: 'transparent' }}>
-                                    <span className="icon"><FaInstagram /></span>
-                                    <span>Instagram</span>
-                                </a>
-                            </div>
+                             {/* 4. Tampilkan tombol hanya jika link-nya ada */}
+                            {whatsappLink && (
+                                <div className="buttons is-centered">
+                                    <a href={whatsappLink.url} target="_blank" rel="noopener noreferrer" className="button is-success is-large">
+                                        <span className="icon"><FaWhatsapp /></span>
+                                        <span>WhatsApp</span>
+                                    </a>
+                                </div>
+                            )}
+
+                            {instagramLink && (
+                                <div className="buttons is-centered">
+                                    <a href={instagramLink.url} target="_blank" rel="noopener noreferrer" className="button is-danger is-large" style={{ background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', borderColor: 'transparent' }}>
+                                        <span className="icon"><FaInstagram /></span>
+                                        <span>Instagram</span>
+                                    </a>
+                                </div>
+                            )}
                         </motion.div>
                     </div>
                 </div>

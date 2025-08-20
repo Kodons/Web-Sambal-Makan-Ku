@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { FaFire } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import useSWR from 'swr';
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
+
 
 const Navbar = () => {
     const [isActive, setIsActive] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+
+    const { data: settings } = useSWR(
+        `${import.meta.env.VITE_BACKEND_URL}/api/settings`,
+        fetcher
+    );
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -24,8 +33,14 @@ const Navbar = () => {
             >
                 <div className="navbar-brand">
                     <a className="navbar-item brand-logo" href="/">
-                        <FaFire className="has-text-danger is-size-4 mr-2" />
-                        <span className="has-text-weight-bold is-size-4">Sambal Teman Ku</span>
+                        {settings && settings.logoImageUrl ? (
+                            <img src={`${import.meta.env.VITE_BACKEND_URL}${settings.logoImageUrl}`} alt="Logo" style={{ maxHeight: '28px' }} />
+                        ) : (
+                            <FaFire className="has-text-danger is-size-4" />
+                        )}
+                        <span className="has-text-weight-bold is-size-5-mobile is-size-4-tablet ml-2">
+                            {settings ? settings.brandName : 'Sambal Teman Makan Ku'}
+                        </span>
                     </a>
                     <a
                         role="button"

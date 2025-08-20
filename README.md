@@ -1,6 +1,6 @@
-# Aplikasi Full-Stack Sambal Juara
+# Aplikasi Full-Stack Sambal Teman Makan Ku
 
-Ini adalah proyek aplikasi web full-stack untuk "Sambal Juara", sebuah brand fiktif produk sambal. Aplikasi ini terdiri dari tiga bagian utama:
+Ini adalah proyek aplikasi web full-stack untuk "Sambal Teman Makan Ku", sebuah brand fiktif produk sambal. Aplikasi ini terdiri dari tiga bagian utama:
 1.  **Landing Page:** Halaman publik yang dinamis dan responsif untuk menampilkan produk kepada pelanggan.
 2.  **Back-end API:** Server Node.js yang terhubung ke database MySQL untuk menyediakan dan mengelola semua data.
 3.  **Admin Panel:** Dasbor internal untuk admin guna mengelola konten website (Produk, Testimoni, Banner) tanpa menyentuh kode.

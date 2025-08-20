@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { fetchWithAuth } from '../utils/api';
 
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const BannerList = () => {
     const [banners, setBanners] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`${BACKEND_URL}/api/popup-banners`)
-            .then(res => res.json())
-            .then(data => setBanners(data));
+        fetchWithAuth('/api/admin/banners')
+            .then(data => {
+                setBanners(data);
+            })
+            .catch(error => toast.error(error.message))
+            .finally(() => setIsLoading(false));
     }, []);
 
     const handleDelete = async (id) => {
         if (window.confirm('Anda yakin ingin menghapus banner ini?')) {
-            await fetch(`${BACKEND_URL}/api/popup-banners/${id}`, {
-                method: 'DELETE',
-            });
-            setBanners(banners.filter(b => b.id !== id));
+            try {
+                await fetchWithAuth(`/api/admin/banners/${id}`, { method: 'DELETE' });
+                setBanners(banners.filter(b => b.id !== id));
+                toast.success('Banner berhasil dihapus!');
+            } catch (error) {
+                toast.error(error.message);
+            }
         }
     };
 

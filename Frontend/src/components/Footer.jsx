@@ -1,8 +1,23 @@
 import React from 'react';
-import { FaFire, FaInstagram, FaWhatsapp } from 'react-icons/fa';
+import useSWR from 'swr';
+import * as FaIcons from 'react-icons/fa';
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const Footer = () => {
   const year = new Date().getFullYear();
+
+  // Ambil data link sosial media dari API back-end
+  const { data: socialLinks = [] } = useSWR(
+    `${import.meta.env.VITE_BACKEND_URL}/api/social-media-links`,
+    fetcher
+  );
+  
+  // Ambil data pengaturan (untuk nama brand) dari API
+  const { data: settings } = useSWR(
+    `${import.meta.env.VITE_BACKEND_URL}/api/settings`,
+    fetcher
+  );
 
   return (
     <footer className="footer has-background-dark has-text-light pt-6">
@@ -11,20 +26,36 @@ const Footer = () => {
 
           {/* Kolom 1: Tentang Brand & Sosial Media */}
           <div className="column is-4">
-            <div className="mb-4">
+           <div className="mb-4">
                 <a href="#" className="is-flex is-align-items-center">
                     <span className="icon is-medium has-text-danger mr-2">
-                        <FaFire size="1.5em"/>
+                        <FaIcons.FaFire size="1.5em"/>
                     </span>
-                    <span className="has-text-weight-bold is-size-4 has-text-white">Sambal Teman Ku</span>
+                    <span className="has-text-weight-bold is-size-4 has-text-white">
+                        {settings ? settings.brandName : 'Sambal Teman Makan Ku'}
+                    </span>
                 </a>
             </div>
             <p className="is-size-6 has-text-grey-light">
                 Sambal rumahan dengan resep warisan, dibuat dari bahan-bahan segar pilihan untuk ledakan rasa di setiap cocolan.
             </p>
             <div className="mt-5">
-                <a href="#" aria-label="Instagram" className="icon is-medium mr-3"><FaInstagram size="1.5em"/></a>
-                <a href="#" aria-label="WhatsApp" className="icon is-medium"><FaWhatsapp size="1.5em"/></a>
+                {socialLinks.map(link => {
+                    const IconComponent = FaIcons[link.iconName];
+                    return (
+                        <a 
+                            key={link.id} 
+                            href={link.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            aria-label={link.platform} 
+                            className="icon is-medium mr-3"
+                        >
+                            {/* Render komponen ikon jika ditemukan */}
+                            {IconComponent ? <IconComponent size="1.5em" /> : null}
+                        </a>
+                    );
+                })}
             </div>
           </div>
 
@@ -56,9 +87,10 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="content has-text-centered pt-6 pb-2">
+       <div className="content has-text-centered pt-6 pb-2">
             <p className="is-size-7 has-text-grey-light">
-                &copy; {year} <strong>Sambal Teman Ku</strong>. All Rights Reserved.
+                {/* PERUBAHAN: Tampilkan nama brand dari API */}
+                &copy; {year} <strong>{settings ? settings.brandName : 'Sambal Juara'}</strong>. All Rights Reserved.
             </p>
         </div>
 

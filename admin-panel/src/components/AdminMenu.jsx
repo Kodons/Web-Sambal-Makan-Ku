@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaBox, FaComment, FaImage } from 'react-icons/fa';
+import { FaBox, FaComment, FaImage, FaCog } from 'react-icons/fa';
 
 const AdminMenu = () => (
     <aside className="menu p-4">
@@ -27,6 +27,14 @@ const AdminMenu = () => (
                     <span className="icon-text">
                         <span className="icon"><FaImage /></span>
                         <span>Banner</span>
+                    </span>
+                </NavLink>
+            </li>
+            <li>
+                <NavLink to="/pengaturan">
+                    <span className="icon-text">
+                        <span className="icon"><FaCog /></span>
+                        <span>Pengaturan</span>
                     </span>
                 </NavLink>
             </li>

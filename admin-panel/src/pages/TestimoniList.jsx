@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Pagination from '../components/Pagination';
+import { fetchWithAuth } from '../utils/api'; // 1. Impor helper
 
 const TestimoniList = () => {
     const [testimonis, setTestimonis] = useState([]);
@@ -12,24 +13,29 @@ const TestimoniList = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        fetch(`http://localhost:3001/api/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`)
-            .then(res => res.json())
+        // 2. Gunakan fetchWithAuth untuk mengambil data
+        fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`)
             .then(response => {
                 setTestimonis(response.data);
                 setTotalPages(Math.ceil(response.total / testimonialsPerPage));
-                setIsLoading(false);
             })
-            .catch(() => {
-                toast.error("Gagal memuat data testimoni.");
-                setIsLoading(false);
-            });
+            .catch(error => toast.error(error.message))
+            .finally(() => setIsLoading(false));
     }, [currentPage]);
 
     const handleDelete = async (id) => {
         if (window.confirm('Anda yakin ingin menghapus testimoni ini?')) {
-            await fetch(`http://localhost:3001/api/testimoni/${id}`, { method: 'DELETE' });
-            setTestimonis(testimonis.filter(t => t.id !== id));
-            toast.success('Testimoni berhasil dihapus!');
+            try {
+                // 3. Gunakan fetchWithAuth untuk menghapus data
+                await fetchWithAuth(`/api/admin/testimoni/${id}`, { method: 'DELETE' });
+                toast.success('Testimoni berhasil dihapus!');
+                // Muat ulang data
+                const response = await fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`);
+                setTestimonis(response.data);
+                setTotalPages(Math.ceil(response.total / testimonialsPerPage));
+            } catch (error) {
+                toast.error(error.message);
+            }
         }
     };
 
@@ -80,12 +86,13 @@ const TestimoniList = () => {
                         ))}
                     </tbody>
                 </table>
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={page => setCurrentPage(page)}
-                />
             </div>
+            
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={page => setCurrentPage(page)}
+            />
         </div>
     );
 };

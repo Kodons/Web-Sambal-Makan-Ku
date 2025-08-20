@@ -9,6 +9,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+}
+
+model Setting {
+  id           Int     @id @default(1)
+  brandName    String? @default("Sambal Juara")
+  logoImageUrl String? @db.VarChar(255)
+}
+
+model SocialMediaLink {
+  id       Int    @id @default(autoincrement())
+  platform String @unique
+  url      String @db.VarChar(255)
+  iconName String // Contoh: "FaInstagram", "FaWhatsapp"
+}
+
+
 model PopupBanner {
   id        Int      @id @default(autoincrement())
   imageUrl  String   @db.VarChar(255)

@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useSWR from 'swr';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Grid, Navigation, Pagination, A11y, Autoplay } from 'swiper/modules';
+import { motion } from 'framer-motion';
 import { FaStar, FaUser } from 'react-icons/fa';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
@@ -11,7 +10,7 @@ const TestimoniCard = ({ testimoni }) => (
         <article className="media">
             <figure className="media-left is-align-self-center">
                 <p className="image is-96x96 avatar-container">
-                    <FaUser size="3.5em" className="has-text-grey"/>
+                    <FaUser size="3.5em" className="has-text-grey" />
                 </p>
             </figure>
             <div className="media-content" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -40,48 +39,56 @@ const TestimoniSection = () => {
         fetcher
     );
 
+    const isMobile = window.innerWidth < 768;
+
+    const [visibleCount, setVisibleCount] = useState(isMobile ? 3 : 6);
+
     const renderContent = () => {
         if (isLoading) return <p>Memuat testimoni...</p>;
         if (error) return <p>Terjadi kesalahan saat memuat data.</p>;
 
-        const testimonials = responseData ? responseData.data : [];
+        const allTestimonials = responseData && responseData.data ? responseData.data : responseData || [];
 
-        if (testimonials.length === 0) {
+        if (allTestimonials.length === 0) {
             return <p className="subtitle is-5 has-text-grey has-text-centered">Belum ada testimoni dari pelanggan.</p>;
         }
 
         return (
-            <Swiper
-                modules={[Grid, Navigation, Pagination, A11y, Autoplay]}
-                slidesPerView={3}
-                slidesPerGroup={3}
-                grid={{
-                    rows: 2,
-                    fill: 'row',
-                }}
-                spaceBetween={30}
-                pagination={{ clickable: true }}
-                navigation={true}
-                autoplay={{ delay: 5000, disableOnInteraction: false }}
-                className="testimonial-swiper-grid"
+            <>
+                <motion.div className="columns is-multiline is-centered">
+                    {allTestimonials.slice(0, visibleCount).map((testimoni) => (
+                        <motion.div
+                            key={testimoni.id}
+                            className="column is-one-third-desktop is-half-tablet is-flex"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <TestimoniCard testimoni={testimoni} />
+                        </motion.div>
+                    ))}
+                </motion.div>
 
-                breakpoints={{
-                    320: { slidesPerView: 1, slidesPerGroup: 1, grid: { rows: 1 } },
-                    768: { slidesPerView: 2, slidesPerGroup: 2, grid: { rows: 2 } },
-                    1024: { slidesPerView: 3, slidesPerGroup: 3, grid: { rows: 2 } },
-                }}
-            >
-                {testimonials.map((testimoni) => (
-                    <SwiperSlide key={testimoni.id}>
-                        <TestimoniCard testimoni={testimoni} />
-                    </SwiperSlide>
-                ))}
-            </Swiper>
+                {visibleCount < allTestimonials.length && (
+                    <div className="has-text-centered mt-6">
+                        <button
+                            className="button is-danger is-rounded is-medium"
+                            onClick={() => setVisibleCount(prevCount => prevCount + (isMobile ? 3 : 6))}
+                        >
+                            Lihat Lebih Banyak
+                        </button>
+                    </div>
+                )}
+            </>
         );
     };
 
     return (
-        <section id="testimoni" className="section is-large has-background-light">
+        <section
+            id="testimoni"
+            className="section is-flex is-align-items-center has-background-light"
+            style={{ minHeight: '100vh' }}
+        >
             <div className="container">
                 <div className="has-text-centered mb-6">
                     <h2 className="title is-2 has-text-black">Apa Kata Mereka?</h2>

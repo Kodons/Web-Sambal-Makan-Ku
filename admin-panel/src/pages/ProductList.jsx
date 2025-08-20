@@ -3,34 +3,41 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaPepperHot } from 'react-icons/fa6';
 import Pagination from '../components/Pagination';
+import { fetchWithAuth } from '../utils/api';
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-     const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-    const productsPerPage = 10; 
+    const productsPerPage = 10;
 
     useEffect(() => {
         setIsLoading(true);
-        fetch(`http://localhost:3001/api/produk?page=${currentPage}&limit=${productsPerPage}`)
-            .then(res => res.json())
+        fetchWithAuth(`/api/admin/produk?page=${currentPage}&limit=${productsPerPage}`)
             .then(response => {
                 setProducts(response.data);
                 setTotalPages(Math.ceil(response.total / productsPerPage));
-                setIsLoading(false);
             })
-            .catch(() => {
-                toast.error("Gagal memuat data produk.");
-                setIsLoading(false);
-            });
+            .catch(error => toast.error(error.message))
+            .finally(() => setIsLoading(false));
     }, [currentPage]);
+
 
     const handleDelete = async (id) => {
         if (window.confirm('Anda yakin ingin menghapus produk ini?')) {
-            await fetch(`http://localhost:3001/api/produk/${id}`, { method: 'DELETE' });
-            setCurrentPage(1);
-            toast.success('Produk berhasil dihapus!');
+            try {
+                await fetchWithAuth(`/api/admin/produk/${id}`, { method: 'DELETE' });
+                toast.success('Produk berhasil dihapus!');
+                // Muat ulang data
+                const response = await fetchWithAuth(`/api/admin/produk?page=${currentPage}&limit=${productsPerPage}`);
+                setProducts(response.data);
+                setTotalPages(Math.ceil(response.total / productsPerPage));
+            } catch (error) {
+                toast.error(error.message);
+            }
         }
     };
 
@@ -90,7 +97,7 @@ const ProductList = () => {
                     </tbody>
                 </table>
             </div>
-            <Pagination 
+            <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={page => setCurrentPage(page)}

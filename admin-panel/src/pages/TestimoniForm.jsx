@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { fetchWithAuth } from '../utils/api'; // 1. Impor helper
 
 const TestimoniForm = () => {
     const [name, setName] = useState('');
@@ -14,8 +15,8 @@ const TestimoniForm = () => {
 
     useEffect(() => {
         if (isEditing) {
-            fetch(`http://localhost:3001/api/testimoni/${id}`)
-                .then(res => res.json())
+            // 2. Gunakan fetchWithAuth untuk mengambil data yang akan diedit
+            fetchWithAuth(`/api/admin/testimoni/${id}`)
                 .then(data => {
                     setName(data.name);
                     setTitle(data.title);
@@ -28,21 +29,21 @@ const TestimoniForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
+        
         const testimoniData = { name, title, quote, rating: parseInt(rating) };
-        const url = isEditing ? `http://localhost:3001/api/testimoni/${id}` : 'http://localhost:3001/api/testimoni';
+        const url = isEditing ? `/api/admin/testimoni/${id}` : '/api/admin/testimoni';
         const method = isEditing ? 'PUT' : 'POST';
 
         try {
-            await fetch(url, {
+            // 3. Gunakan fetchWithAuth untuk mengirim data
+            await fetchWithAuth(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(testimoniData),
             });
             toast.success(`Testimoni berhasil ${isEditing ? 'diperbarui' : 'dibuat'}!`);
             navigate('/testimoni');
         } catch (error) {
-            toast.error("Terjadi kesalahan saat menyimpan data.");
+            toast.error("Terjadi kesalahan: " + error.message);
         } finally {
             setIsSubmitting(false);
         }

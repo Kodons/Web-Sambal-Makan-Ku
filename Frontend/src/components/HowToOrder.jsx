@@ -6,7 +6,7 @@ const HowToOrder = () => {
         <section className="section is-medium has-background-dark has-text-light">
             <div className="container has-text-centered">
                 <h2 className="title is-2 has-text-white">Cara Pesan, Gampang Banget!</h2>
-                <p className="subtitle is-5 has-text-grey-light mb-6">Hanya butuh 3 langkah mudah untuk menikmati Sambal Juara.</p>
+                <p className="subtitle is-5 has-text-grey-light mb-6">Hanya butuh 3 langkah mudah untuk menikmati Sambal Teman Makan Ku.</p>
 
                 <div className="columns is-centered steps-container">
 

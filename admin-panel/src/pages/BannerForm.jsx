@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { fetchWithAuth } from '../utils/api';
 
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const BannerForm = () => {
     const [imageUrl, setImageUrl] = useState('');
@@ -16,11 +17,12 @@ const BannerForm = () => {
 
     useEffect(() => {
         if (isEditing) {
-            fetch(`${BACKEND_URL}/api/popup-banners/${id}`)
-                .then(res => res.json())
+            fetchWithAuth(`/api/admin/banners/${id}`)
                 .then(data => {
-                    setImageUrl(data.imageUrl);
-                    setIsActive(data.isActive);
+                    if(data) {
+                        setImageUrl(data.imageUrl);
+                        setIsActive(data.isActive);
+                    }
                 });
         }
     }, [id, isEditing]);
@@ -32,7 +34,6 @@ const BannerForm = () => {
         }
         const objectUrl = URL.createObjectURL(selectedFile);
         setPreviewUrl(objectUrl);
-
         return () => URL.revokeObjectURL(objectUrl);
     }, [selectedFile]);
 
@@ -46,15 +47,20 @@ const BannerForm = () => {
         e.preventDefault();
         setIsSubmitting(true);
         let finalImageUrl = imageUrl;
+        const token = localStorage.getItem('authToken');
 
         if (selectedFile) {
             const formData = new FormData();
             formData.append('file', selectedFile);
             try {
-                const uploadRes = await fetch(`${BACKEND_URL}/api/upload`, {
+                // PERUBAHAN 1: Ganti URL ke endpoint admin yang benar
+                const uploadRes = await fetch(`${BACKEND_URL}/api/admin/upload`, {
                     method: 'POST',
+                    // PERUBAHAN 2: Tambahkan header Authorization untuk upload
+                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData,
                 });
+                if (!uploadRes.ok) throw new Error('Upload failed');
                 const uploadData = await uploadRes.json();
                 finalImageUrl = uploadData.filePath;
             } catch (error) {
@@ -65,19 +71,19 @@ const BannerForm = () => {
         }
 
         const bannerData = { imageUrl: finalImageUrl, isActive };
-        const url = isEditing ? `${BACKEND_URL}/api/popup-banners/${id}` : `${BACKEND_URL}/api/popup-banners`;
+        // PERUBAHAN 3: Pastikan URL submit juga benar
+        const url = isEditing ? `/api/admin/banners/${id}` : '/api/admin/banners';
         const method = isEditing ? 'PUT' : 'POST';
 
         try {
-            await fetch(url, {
+            await fetchWithAuth(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(bannerData),
             });
             toast.success(`Banner berhasil ${isEditing ? 'diperbarui' : 'dibuat'}!`);
             navigate('/banners');
         } catch (error) {
-            toast.error("Terjadi kesalahan saat menyimpan banner.");
+            toast.error("Gagal menyimpan banner: " + error.message);
         } finally {
             setIsSubmitting(false);
         }
@@ -100,7 +106,6 @@ const BannerForm = () => {
                                 <p className="has-text-grey">Tidak ada gambar yang dipilih.</p>
                             )}
                         </div>
-
                         <div className="control">
                             <input className="input" type="file" onChange={handleFileChange} />
                         </div>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { fetchWithAuth } from '../utils/api'; // Pastikan helper diimpor
 
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ProductForm = () => {
     const [name, setName] = useState('');
@@ -19,14 +20,16 @@ const ProductForm = () => {
 
     useEffect(() => {
         if (isEditing) {
-            fetch(`${BACKEND_URL}/api/produk/${id}`)
-                .then(res => res.json())
+            // Gunakan fetchWithAuth untuk mengambil data
+            fetchWithAuth(`/api/admin/produk/${id}`)
                 .then(data => {
-                    setName(data.name);
-                    setLevel(data.level);
-                    setDescription(data.description);
-                    setImageUrl(data.imageUrl);
-                    setHarga(data.harga);
+                    if (data) {
+                        setName(data.name || '');
+                        setLevel(data.level || 0);
+                        setDescription(data.description || '');
+                        setImageUrl(data.imageUrl || '');
+                        setHarga(data.harga || 0);
+                    }
                 });
         }
     }, [id, isEditing]);
@@ -51,12 +54,15 @@ const ProductForm = () => {
         e.preventDefault();
         setIsSubmitting(true);
         let finalImageUrl = imageUrl;
+        const token = localStorage.getItem('authToken');
+
         if (selectedFile) {
             const formData = new FormData();
             formData.append('file', selectedFile);
             try {
-                const uploadRes = await fetch(`${BACKEND_URL}/api/upload`, {
+                const uploadRes = await fetch(`${BACKEND_URL}/api/admin/upload`, {
                     method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData,
                 });
                 if (!uploadRes.ok) throw new Error('Upload failed');
@@ -68,16 +74,18 @@ const ProductForm = () => {
                 return;
             }
         }
+
         const productData = { name, level: parseInt(level), description, imageUrl: finalImageUrl, harga: parseInt(harga) };
-        const url = isEditing ? `${BACKEND_URL}/api/produk/${id}` : `${BACKEND_URL}/api/produk`;
+        
+        // PERUBAHAN UTAMA: Tambahkan '/admin' ke URL
+        const url = isEditing ? `/api/admin/produk/${id}` : `/api/admin/produk`;
         const method = isEditing ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch(url, {
+            await fetchWithAuth(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(productData),
             });
-            if (!response.ok) throw new Error('Submit failed');
             toast.success(`Produk berhasil ${isEditing ? 'diperbarui' : 'dibuat'}!`);
             navigate('/produk');
         } catch (error) {
@@ -98,13 +106,13 @@ const ProductForm = () => {
             <h1 className="title">{isEditing ? 'Edit Produk' : 'Tambah Produk Baru'}</h1>
             <div className="box">
                 <form onSubmit={handleSubmit}>
-                     <div className="field">
+                    <div className="field">
                         <label className="label">Nama Produk</label>
                         <div className="control">
                            <input className="input" type="text" value={name} onChange={e => setName(e.target.value)} required />
                         </div>
-                     </div>
-                     <div className="field">
+                    </div>
+                    <div className="field">
                         <label className="label">Level Pedas</label>
                         <div className="control">
                             <input 
@@ -112,13 +120,12 @@ const ProductForm = () => {
                                 type="number" 
                                 value={level} 
                                 onChange={e => setLevel(e.target.value)} 
-                                min="1" 
-                                max="5" 
+                                min="1" max="5" 
                                 required 
                             />
                         </div>
-                     </div>
-                     <div className="field">
+                    </div>
+                    <div className="field">
                         <label className="label">Deskripsi</label>
                         <div className="control">
                            <textarea 
@@ -130,18 +137,15 @@ const ProductForm = () => {
                             ></textarea>
                             <p className="help has-text-right">{description.length} / 100</p>
                         </div>
-                     </div>
-
-                      <div className="field">
+                    </div>
+                    <div className="field">
                         <label className="label">Harga (Rupiah)</label>
                         <div className="control">
                             <input className="input" type="number" placeholder="Contoh: 25000" value={harga} onChange={e => setHarga(e.target.value)} required />
                         </div>
                     </div>
-                    
                     <div className="field">
                         <label className="label">Gambar Produk</label>
-                        
                         <div className="mb-4">
                             <p>Preview:</p>
                             {previewUrl ? (
@@ -152,13 +156,11 @@ const ProductForm = () => {
                                 <p className="has-text-grey">Tidak ada gambar yang dipilih.</p>
                             )}
                         </div>
-                        
                         <div className="control">
                             <input className="input" type="file" onChange={handleFileChange} />
                         </div>
                         <p className="help">{isEditing ? 'Pilih file baru untuk mengganti gambar di atas.' : 'Pilih file untuk diunggah.'}</p>
                     </div>
-
                     <div className="field is-grouped mt-5">
                        <div className="control">
                            <button type="submit" className={`button is-link ${isSubmitting ? 'is-loading' : ''}`} disabled={isSubmitting}>

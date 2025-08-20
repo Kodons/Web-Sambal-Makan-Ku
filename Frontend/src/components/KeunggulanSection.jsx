@@ -18,7 +18,7 @@ const KeunggulanSection = () => {
     return (
         <section id="tentang" className="section is-large">
             <div className="container has-text-centered">
-                <h2 className="title is-2">Kenapa Sambal Teman Ku?</h2>
+                <h2 className="title is-2">Kenapa Sambal Teman Makan Ku?</h2>
                 <p className="subtitle is-5 has-text-grey mb-6">Enam pilar utama yang membuat kami istimewa.</p>
                 <motion.div 
                     className="columns is-centered is-multiline"

@@ -35,7 +35,7 @@ const HeroSection = () => {
                         initial={{ y: 50, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.2 }}>
-                        Rasakan sensasi pedas otentik dari Sambal Teman Ku, dibuat sepenuh hati dengan resep warisan nusantara.
+                        Rasakan sensasi pedas otentik dari Sambal Teman Makan Ku, dibuat sepenuh hati dengan resep warisan nusantara.
                     </motion.h2>
                     <motion.a
                         href="#produk"

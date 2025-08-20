@@ -1,29 +1,61 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
+import LoginPage from './pages/LoginPage';
 import ProductList from './pages/ProductList';
 import ProductForm from './pages/ProductForm';
 import TestimoniList from './pages/TestimoniList';
 import TestimoniForm from './pages/TestimoniForm';
 import BannerList from './pages/BannerList';
 import BannerForm from './pages/BannerForm';
+import SettingsPage from './pages/SettingsPage';
+
+// Komponen untuk melindungi rute
+const ProtectedRoute = ({ children }) => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+    return children;
+};
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/produk" replace />} />
-        <Route element={<Layout />}>
-          <Route path="/produk" element={<ProductList />} />
-          <Route path="/produk/baru" element={<ProductForm />} />
-          <Route path="/produk/edit/:id" element={<ProductForm />} />
-          <Route path="/testimoni" element={<TestimoniList />} />
-          <Route path="/testimoni/baru" element={<TestimoniForm />} />
-          <Route path="/testimoni/edit/:id" element={<TestimoniForm />} />
-          <Route path="/banners" element={<BannerList />} />
-          <Route path="/banners/baru" element={<BannerForm />} />
-          <Route path="/banners/edit/:id" element={<BannerForm />} />
+        {/* Rute publik untuk halaman login */}
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* Semua rute admin sekarang bersarang di dalam Layout */}
+        <Route 
+            path="/" 
+            element={
+                <ProtectedRoute>
+                    <Layout />
+                </ProtectedRoute>
+            }
+        >
+            {/* Rute default akan dialihkan ke /produk */}
+            <Route index element={<Navigate to="/produk" replace />} />
+
+            <Route path="produk" element={<ProductList />} />
+            <Route path="produk/baru" element={<ProductForm />} />
+            <Route path="produk/edit/:id" element={<ProductForm />} />
+            
+            <Route path="testimoni" element={<TestimoniList />} />
+            <Route path="testimoni/baru" element={<TestimoniForm />} />
+            <Route path="testimoni/edit/:id" element={<TestimoniForm />} />
+            
+            <Route path="banners" element={<BannerList />} />
+            <Route path="banners/baru" element={<BannerForm />} />
+            <Route path="banners/edit/:id" element={<BannerForm />} />
+            
+            <Route path="pengaturan" element={<SettingsPage />} />
         </Route>
+        
+        {/* Rute 'catch-all' untuk halaman yang tidak ditemukan */}
+        <Route path="*" element={<h1>404: Halaman Tidak Ditemukan</h1>} />
+
       </Routes>
     </BrowserRouter>
   );

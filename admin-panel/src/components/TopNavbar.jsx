@@ -1,10 +1,18 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const TopNavbar = ({ isMobileMenuActive, onBurgerClick }) => {
     const location = useLocation();
+    const navigate = useNavigate();
     const pathnames = location.pathname.split('/').filter((x) => x);
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        toast.success('Anda berhasil logout.');
+        navigate('/login');
+    };
     
     return (
         <nav className="navbar is-white top-navbar" role="navigation">
@@ -45,7 +53,9 @@ const TopNavbar = ({ isMobileMenuActive, onBurgerClick }) => {
                         <div className="navbar-item has-dropdown is-hoverable">
                             <a className="navbar-link"><span className="icon"><FaUserCircle /></span><span>Admin</span></a>
                             <div className="navbar-dropdown is-right">
-                                <a className="navbar-item">Logout</a>
+                                <a className="navbar-item" onClick={handleLogout}>
+                                    Logout
+                                </a>
                             </div>
                         </div>
                     </div>

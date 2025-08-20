@@ -53,12 +53,11 @@ Selamat datang di repositori "Sambal Teman Makan Ku"! Ini adalah proyek aplikasi
 ### 📂 Struktur Proyek
 
 Proyek ini dibagi menjadi tiga folder utama:
-
-/
-├── admin-panel/        # Proyek React untuk Admin Panel
-├── backend-sambal/     # Proyek Node.js untuk Back-end API
-└── sambal-react-vite/  # Proyek React untuk Landing Page utama
-
+```
+├── admin-panel/ # Proyek React untuk Admin Panel
+├── backend/     # Proyek Node.js untuk Back-end API
+└── frontend/    # Proyek React untuk Landing Page utama
+```
 
 ---
 

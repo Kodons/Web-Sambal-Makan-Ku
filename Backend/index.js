@@ -4,6 +4,8 @@ const cors = require("cors");
 const path = require("path");
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 
@@ -70,6 +72,120 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+app.post('/api/forgot-password', async (req, res) => {
+  const { username } = req.body;
+  console.log(`[LOG] Menerima permintaan reset password untuk username: "${username}"`);
+
+  try {
+    const admin = await prisma.admin.findUnique({ where: { username } });
+
+    if (!admin || !admin.email) {
+      console.log(`[LOG] Admin "${username}" tidak ditemukan atau tidak memiliki email. Mengirim respons sukses palsu.`);
+      return res.json({ message: 'Jika username terdaftar, email reset telah dikirim.' });
+    }
+    console.log(`[LOG] Admin ditemukan: ${admin.username} (Email: ${admin.email})`);
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const passwordResetExpires = new Date(Date.now() + 3600000);
+    console.log(`[LOG] Token reset berhasil dibuat.`);
+
+    await prisma.admin.update({
+      where: { username },
+      data: {
+        resetPasswordToken: resetToken,
+        resetPasswordExpires: passwordResetExpires,
+      },
+    });
+    console.log(`[LOG] Token berhasil disimpan ke database.`);
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.BREVO_API_KEY || process.env.EMAIL_PASS,
+      },
+    });
+
+    const resetUrl = `http://localhost:5174/reset-password/${resetToken}`;
+    console.log(`[LOG] Mencoba mengirim email ke: ${admin.email}`);
+
+    await transporter.sendMail({
+      to: admin.email, 
+      from: `Admin Sambal TMK <${process.env.SENDER_EMAIL}>`,
+      subject: 'Reset Password Admin',
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
+            <h2 style="color: #c0392b;">Permintaan Reset Password</h2>
+            <p>Halo ${admin.username},</p>
+            <p>Anda menerima email ini karena ada permintaan untuk mereset password akun admin Anda.</p>
+            <p>Silakan klik tombol di bawah ini untuk melanjutkan. Link ini akan kedaluwarsa dalam 1 jam.</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="${resetUrl}" style="background-color: #c0392b; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                    Reset Password Saya
+                </a>
+            </div>
+            <p>Jika Anda tidak meminta ini, silakan abaikan email ini dan password Anda akan tetap aman.</p>
+            <hr style="border: none; border-top: 1px solid #eee;">
+            <p style="font-size: 0.8em; color: #777;">Jika tombol tidak berfungsi, salin dan tempel URL berikut di browser Anda:</p>
+            <p style="font-size: 0.8em; color: #777; word-break: break-all;">${resetUrl}</p>
+        </div>
+      `,
+    });
+    console.log(`[LOG] Email berhasil dikirim.`);
+
+    res.json({ message: 'Jika username terdaftar, email reset telah dikirim.' });
+  } catch (error) {
+    console.error("--- ERROR DI FORGOT-PASSWORD ---");
+    console.error(error);
+    console.error("---------------------------------");
+    res.status(500).json({ error: 'Gagal mengirim email reset.' });
+  }
+});
+
+// Endpoint untuk mereset password dengan token
+app.post("/api/reset-password/:token", async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  console.log(`[LOG] Menerima permintaan reset dengan token.`);
+
+  try {
+    const admin = await prisma.admin.findFirst({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { gt: new Date() },
+      },
+    });
+
+    if (!admin) {
+      console.log(`[LOG] Token tidak valid atau kedaluwarsa.`);
+      return res.status(400).json({ error: "Token reset password tidak valid atau sudah kedaluwarsa." });
+    }
+    console.log(`[LOG] Token valid untuk admin: ${admin.username}`);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(`[LOG] Password baru berhasil di-hash.`);
+
+    await prisma.admin.update({
+      where: { id: admin.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
+    });
+    console.log(`[LOG] Password untuk ${admin.username} berhasil direset.`);
+
+    res.json({ message: "Password berhasil direset." });
+  } catch (error) {
+    console.error("--- ERROR DI RESET-PASSWORD ---");
+    console.error(error);
+    console.error("-------------------------------");
+    res.status(500).json({ error: "Gagal mereset password." });
+  }
+});
+
 // --- DATA UNTUK LANDING PAGE ---
 app.get("/api/produk", async (req, res) => {
   const allProduk = await prisma.produk.findMany({ orderBy: { id: "asc" } });
@@ -116,8 +232,8 @@ const authenticateToken = (req, res, next) => {
 //  BAGIAN 3: ENDPOINT ADMIN (SEMUA DI BAWAH INI PERLU LOGIN)
 // =========================================================================
 const adminRouter = express.Router();
-adminRouter.use(authenticateToken);
-app.use("/api/admin", adminRouter);
+adminRouter.use(authenticateToken); // Terapkan penjaga ke semua rute di dalam router ini
+app.use("/api/admin", adminRouter); // Gunakan router ini untuk semua path /api/admin
 
 // --- UPLOAD (ADMIN) ---
 adminRouter.post("/upload", upload.single("file"), (req, res) => {
@@ -146,20 +262,16 @@ adminRouter.get("/produk/:id", async (req, res) => {
 });
 adminRouter.post("/produk", async (req, res) => {
   const { name, level, description, imageUrl, harga } = req.body;
-  try {
-    const newProduk = await prisma.produk.create({
-      data: {
-        name,
-        level: parseInt(level),
-        description,
-        imageUrl,
-        harga: parseInt(harga),
-      },
-    });
-    res.status(201).json(newProduk);
-  } catch (error) {
-    res.status(500).json({ error: "Gagal membuat produk baru" });
-  }
+  const newProduk = await prisma.produk.create({
+    data: {
+      name,
+      level: parseInt(level),
+      description,
+      imageUrl,
+      harga: parseInt(harga),
+    },
+  });
+  res.status(201).json(newProduk);
 });
 adminRouter.put("/produk/:id", async (req, res) => {
   const { id } = req.params;
@@ -269,24 +381,18 @@ adminRouter.delete("/banners/:id", async (req, res) => {
 
 // --- PENGATURAN & SOSMED (ADMIN) ---
 adminRouter.get("/settings", async (req, res) => {
-    try {
-        const settings = await prisma.setting.upsert({
-            where: { id: 1 },
-            update: {},
-            create: { id: 1, brandName: 'Sambal Teman Makan Ku' },
-        });
-        res.json(settings);
-    } catch (error) {
-        res.status(500).json({ error: 'Gagal mengambil pengaturan' });
-    }
+  const settings = await prisma.setting.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1, brandName: "Sambal Teman Makan Ku" },
+  });
+  res.json(settings);
 });
 adminRouter.get("/social-media-links", async (req, res) => {
-    try {
-        const links = await prisma.socialMediaLink.findMany({ orderBy: { id: 'asc' } });
-        res.json(links);
-    } catch (error) {
-        res.status(500).json({ error: 'Gagal mengambil link sosmed' });
-    }
+  const links = await prisma.socialMediaLink.findMany({
+    orderBy: { id: "asc" },
+  });
+  res.json(links);
 });
 adminRouter.put("/settings", async (req, res) => {
   const { brandName, logoImageUrl } = req.body;

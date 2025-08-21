@@ -1,0 +1,76 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.login-card {
+  display: flex;
+  width: 100%;
+  /* PERUBAHAN: Kartu dibuat lebih besar */
+  max-width: 1024px; 
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.login-illustration-section {
+  background-color: #7f56d9; /* Warna ungu brand */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: white; /* Warna untuk ikon */
+}
+
+.login-form-section {
+  padding: 3rem 4rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Posisikan form di tengah vertikal */
+}
+
+.login-form-section .title {
+  font-weight: 300;
+  color: #555;
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.login-form-section .title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 25px;
+  background-color: #7f56d9;
+  border-radius: 3px;
+}
+
+.login-button {
+  background-color: #7f56d9 !important;
+  border-color: transparent !important;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #6941c6 !important;
+}
+
+/* Penyesuaian untuk mobile */
+@media (max-width: 768px) {
+  .login-illustration-section {
+    display: none;
+  }
+  .login-form-section {
+    padding: 2rem;
+  }
+}

@@ -4,6 +4,7 @@ import App from './App.jsx';
 import 'bulma/css/bulma.min.css';
 import { Toaster } from 'react-hot-toast';
 import './styles/admin.css';
+import './styles/login.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

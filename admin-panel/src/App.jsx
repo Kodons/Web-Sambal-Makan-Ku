@@ -9,11 +9,14 @@ import TestimoniForm from './pages/TestimoniForm';
 import BannerList from './pages/BannerList';
 import BannerForm from './pages/BannerForm';
 import SettingsPage from './pages/SettingsPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Komponen untuk melindungi rute
 const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem('authToken');
     if (!token) {
+        // Jika tidak ada token, arahkan ke halaman login
         return <Navigate to="/login" replace />;
     }
     return children;
@@ -23,10 +26,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rute publik untuk halaman login */}
+        {/* Rute Publik (tidak perlu login) */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         
-        {/* Semua rute admin sekarang bersarang di dalam Layout */}
+        {/* Semua rute admin sekarang bersarang di dalam Layout dan diproteksi */}
         <Route 
             path="/" 
             element={

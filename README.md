@@ -1,5 +1,13 @@
 # Sambal Teman Makan Ku: Aplikasi Web Full-Stack Produk Sambal
 
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![Bulma](https://img.shields.io/badge/Bulma-00D1B2?style=flat-square&logo=bulma&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=flat-square&logo=Prisma&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat-square&logo=vite&logoColor=FFD62E)
+
 Selamat datang di repositori "Sambal Teman Makan Ku"! Ini adalah proyek aplikasi web full-stack yang dirancang untuk brand produk sambal khas Lombok. Aplikasi ini terdiri dari tiga bagian utama yang bekerja secara terpisah namun terintegrasi: sebuah **Landing Page**, **Back-end API**, dan **Admin Panel**.
 
 ---
@@ -14,6 +22,7 @@ Selamat datang di repositori "Sambal Teman Makan Ku"! Ini adalah proyek aplikasi
 
 #### Admin Panel
 - **Otentikasi Aman**: Sistem login berbasis JWT (JSON Web Token) untuk melindungi semua halaman admin.
+- **Keamanan:** Halaman admin diproteksi dengan sistem login berbasis JWT (JSON Web Token) dan memiliki fitur "Lupa Password" via email.
 - **Manajemen Konten (CRUD)**: Fungsionalitas penuh untuk Create, Read, Update, dan Delete data.
 - **Pengelolaan Dinamis**: Mengelola Produk, Testimoni, Banner Promosi, dan Pengaturan Website.
 - **Upload Gambar**: Fitur upload gambar yang mudah digunakan dengan *preview* instan.
@@ -44,6 +53,8 @@ Selamat datang di repositori "Sambal Teman Makan Ku"! Ini adalah proyek aplikasi
 - Prisma
 - Multer
 - bcryptjs & jsonwebtoken
+- Nodemailer
+- CORS
 
 #### Database
 - MySQL
@@ -83,8 +94,17 @@ Ikuti langkah-langkah ini secara berurutan untuk menjalankan proyek secara lokal
     Buat file `.env` dan isi dengan format di bawah. Sesuaikan `DATABASE_URL` dan `JWT_SECRET` Anda. Kode JWT ketik manual bebas terserah.
     ```dotenv
     # backend/.env
+    # Konfigurasi Database
     DATABASE_URL="mysql://root:@localhost:3306/sambal_db"
+
+    # Kunci Rahasia untuk JWT (Generate sendiri)
     JWT_SECRET="ganti_dengan_kunci_rahasia_acak_yang_sangat_panjang"
+
+    # Konfigurasi Pengiriman Email (Contoh menggunakan Brevo)
+    EMAIL_HOST="smtp-relay.brevo.com"
+    EMAIL_USER="login_smtp_dari_brevo@smtp-brevo.com"
+    BREVO_API_KEY="kunci_api_panjang_anda_dari_brevo"
+    SENDER_EMAIL="email_anda_yang_sudah_diverifikasi@gmail.com"
     ```
     Jalankan migrasi Prisma untuk membuat semua tabel:
     ```bash
@@ -141,8 +161,11 @@ Ikuti langkah-langkah ini secara berurutan untuk menjalankan proyek secara lokal
     {
         "username": "admin",
         "password": "password_aman_anda"
+        "email": "email_valid_anda@gmail.com"
     }
     ```
+    Penting: Pastikan Anda mengisi email agar fitur "Lupa Password" berfungsi untuk akun ini.
+    
     Setelah *request* berhasil, Anda bisa *login* ke Admin Panel di `http://localhost:5174` menggunakan kredensial tersebut.
 
 ---

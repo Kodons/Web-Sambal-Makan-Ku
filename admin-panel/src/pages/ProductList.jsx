@@ -5,8 +5,6 @@ import { FaPepperHot } from 'react-icons/fa6';
 import Pagination from '../components/Pagination';
 import { fetchWithAuth } from '../utils/api';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +29,6 @@ const ProductList = () => {
             try {
                 await fetchWithAuth(`/api/admin/produk/${id}`, { method: 'DELETE' });
                 toast.success('Produk berhasil dihapus!');
-                // Muat ulang data
                 const response = await fetchWithAuth(`/api/admin/produk?page=${currentPage}&limit=${productsPerPage}`);
                 setProducts(response.data);
                 setTotalPages(Math.ceil(response.total / productsPerPage));

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Pagination from '../components/Pagination';
-import { fetchWithAuth } from '../utils/api'; // 1. Impor helper
+import { fetchWithAuth } from '../utils/api';
 
 const TestimoniList = () => {
     const [testimonis, setTestimonis] = useState([]);
@@ -13,7 +13,6 @@ const TestimoniList = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        // 2. Gunakan fetchWithAuth untuk mengambil data
         fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`)
             .then(response => {
                 setTestimonis(response.data);
@@ -26,10 +25,8 @@ const TestimoniList = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Anda yakin ingin menghapus testimoni ini?')) {
             try {
-                // 3. Gunakan fetchWithAuth untuk menghapus data
                 await fetchWithAuth(`/api/admin/testimoni/${id}`, { method: 'DELETE' });
                 toast.success('Testimoni berhasil dihapus!');
-                // Muat ulang data
                 const response = await fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`);
                 setTestimonis(response.data);
                 setTotalPages(Math.ceil(response.total / testimonialsPerPage));

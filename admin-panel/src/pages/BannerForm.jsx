@@ -19,7 +19,7 @@ const BannerForm = () => {
         if (isEditing) {
             fetchWithAuth(`/api/admin/banners/${id}`)
                 .then(data => {
-                    if(data) {
+                    if (data) {
                         setImageUrl(data.imageUrl);
                         setIsActive(data.isActive);
                     }
@@ -53,10 +53,8 @@ const BannerForm = () => {
             const formData = new FormData();
             formData.append('file', selectedFile);
             try {
-                // PERUBAHAN 1: Ganti URL ke endpoint admin yang benar
                 const uploadRes = await fetch(`${BACKEND_URL}/api/admin/upload`, {
                     method: 'POST',
-                    // PERUBAHAN 2: Tambahkan header Authorization untuk upload
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData,
                 });
@@ -71,7 +69,6 @@ const BannerForm = () => {
         }
 
         const bannerData = { imageUrl: finalImageUrl, isActive };
-        // PERUBAHAN 3: Pastikan URL submit juga benar
         const url = isEditing ? `/api/admin/banners/${id}` : '/api/admin/banners';
         const method = isEditing ? 'PUT' : 'POST';
 
@@ -107,7 +104,12 @@ const BannerForm = () => {
                             )}
                         </div>
                         <div className="control">
-                            <input className="input" type="file" onChange={handleFileChange} />
+                            <input
+                                className="input"
+                                type="file"
+                                onChange={handleFileChange}
+                                accept="image/png, image/jpeg, image/webp"
+                            />
                         </div>
                         <p className="help">{isEditing ? 'Pilih file baru untuk mengganti gambar di atas.' : 'Pilih file untuk diunggah.'}</p>
                     </div>

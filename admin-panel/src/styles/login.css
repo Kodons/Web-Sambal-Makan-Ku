@@ -9,7 +9,6 @@
 .login-card {
   display: flex;
   width: 100%;
-  /* PERUBAHAN: Kartu dibuat lebih besar */
   max-width: 1024px; 
   background-color: white;
   border-radius: 12px;
@@ -18,12 +17,12 @@
 }
 
 .login-illustration-section {
-  background-color: #7f56d9; /* Warna ungu brand */
+  background-color: #7f56d9;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: white; /* Warna untuk ikon */
+  color: white;
 }
 
 .login-form-section {
@@ -31,7 +30,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Posisikan form di tengah vertikal */
+  justify-content: center;
 }
 
 .login-form-section .title {

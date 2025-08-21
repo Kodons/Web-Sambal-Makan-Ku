@@ -67,7 +67,6 @@ const KontakSection = () => {
                             transition={{ duration: 0.8, delay: 0.2 }}
                         >
                             <h3 className="title is-4">Hubungi kami melalui:</h3>
-                             {/* 4. Tampilkan tombol hanya jika link-nya ada */}
                             {whatsappLink && (
                                 <div className="buttons is-centered">
                                     <a href={whatsappLink.url} target="_blank" rel="noopener noreferrer" className="button is-success is-large">

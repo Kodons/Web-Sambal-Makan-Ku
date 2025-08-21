@@ -7,13 +7,11 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 const Footer = () => {
   const year = new Date().getFullYear();
 
-  // Ambil data link sosial media dari API back-end
   const { data: socialLinks = [] } = useSWR(
     `${import.meta.env.VITE_BACKEND_URL}/api/social-media-links`,
     fetcher
   );
   
-  // Ambil data pengaturan (untuk nama brand) dari API
   const { data: settings } = useSWR(
     `${import.meta.env.VITE_BACKEND_URL}/api/settings`,
     fetcher

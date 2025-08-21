@@ -17,6 +17,7 @@ const ProductCard = ({ product }) => (
                         src={`${import.meta.env.VITE_BACKEND_URL}${product.imageUrl}`}
                         alt={product.name}
                         style={{ objectFit: 'cover', height: '100%', width: '100%' }}
+                        loading="lazy"
                     />
                 </figure>
             </div>

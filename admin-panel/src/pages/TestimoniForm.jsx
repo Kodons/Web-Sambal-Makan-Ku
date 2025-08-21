@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { fetchWithAuth } from '../utils/api'; // 1. Impor helper
+import { fetchWithAuth } from '../utils/api';
 
 const TestimoniForm = () => {
     const [name, setName] = useState('');
@@ -15,7 +15,6 @@ const TestimoniForm = () => {
 
     useEffect(() => {
         if (isEditing) {
-            // 2. Gunakan fetchWithAuth untuk mengambil data yang akan diedit
             fetchWithAuth(`/api/admin/testimoni/${id}`)
                 .then(data => {
                     setName(data.name);
@@ -35,7 +34,6 @@ const TestimoniForm = () => {
         const method = isEditing ? 'PUT' : 'POST';
 
         try {
-            // 3. Gunakan fetchWithAuth untuk mengirim data
             await fetchWithAuth(url, {
                 method,
                 body: JSON.stringify(testimoniData),

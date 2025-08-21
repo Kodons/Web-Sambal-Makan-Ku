@@ -4,10 +4,15 @@ const cors = require("cors");
 const path = require("path");
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
+const { body, validationResult } = require("express-validator");
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const sharp = require('sharp');
+const fs = require('fs');
 
 // =========================================================================
 //  KONFIGURASI DASAR
@@ -18,41 +23,85 @@ const PORT = 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // --- MIDDLEWARE ---
-app.use(cors());
+app.use(helmet({ crossOriginResourcePolicy: false }));
+
+// 2. Konfigurasi dan terapkan CORS yang aman
+const whitelist = [
+    'http://localhost:5173', // Alamat Landing Page (development)
+    'http://localhost:5174', // Alamat Admin Panel (development)
+    'http://localhost:3000'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Tidak diizinkan oleh CORS'));
+    }
+  }
+};
+app.use(cors(corsOptions));
+
+// 3. Middleware lain setelah keamanan
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // --- KONFIGURASI UPLOAD (MULTER) ---
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads"),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
-const upload = multer({ storage });
+const storage = multer.memoryStorage(); 
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Hanya file gambar yang diizinkan!'), false);
+    }
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 // =========================================================================
 //  BAGIAN 1: ENDPOINT PUBLIK (TIDAK PERLU LOGIN)
 // =========================================================================
 
+// --- KONFIGURASI RATE LIMITER ---
+const authLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 10,
+	standardHeaders: true,
+	legacyHeaders: false,
+    message: { error: 'Terlalu banyak percobaan, silakan coba lagi setelah 15 menit' }
+});
+
 // --- AUTENTIKASI ---
-app.post("/api/register", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ error: "Username dan password diperlukan" });
+app.post('/api/register', authLimiter, async (req, res) => {
+  const { username, password, email } = req.body;
+
+  if (!username || !password || !email) {
+    return res.status(400).json({ error: "Username, password, dan email diperlukan" });
   }
+  
   const hashedPassword = await bcrypt.hash(password, 10);
+  
   try {
     const admin = await prisma.admin.create({
-      data: { username, password: hashedPassword },
+      data: {
+        username,
+        password: hashedPassword,
+        email,
+      },
     });
     res
       .status(201)
       .json({ message: "Admin berhasil dibuat", userId: admin.id });
   } catch (error) {
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+        return res.status(400).json({ error: "Email sudah terdaftar" });
+    }
     res.status(400).json({ error: "Username sudah ada" });
   }
 });
 
-app.post("/api/login", async (req, res) => {
+app.post("/api/login", authLimiter, async (req, res) => {
   const { username, password } = req.body;
   try {
     const admin = await prisma.admin.findUnique({ where: { username } });
@@ -72,18 +121,26 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.post('/api/forgot-password', async (req, res) => {
+app.post("/api/forgot-password", authLimiter, async (req, res) => {
   const { username } = req.body;
-  console.log(`[LOG] Menerima permintaan reset password untuk username: "${username}"`);
+  console.log(
+    `[LOG] Menerima permintaan reset password untuk username: "${username}"`
+  );
 
   try {
     const admin = await prisma.admin.findUnique({ where: { username } });
 
     if (!admin || !admin.email) {
-      console.log(`[LOG] Admin "${username}" tidak ditemukan atau tidak memiliki email. Mengirim respons sukses palsu.`);
-      return res.json({ message: 'Jika username terdaftar, email reset telah dikirim.' });
+      console.log(
+        `[LOG] Admin "${username}" tidak ditemukan atau tidak memiliki email. Mengirim respons sukses palsu.`
+      );
+      return res.json({
+        message: "Jika username terdaftar, email reset telah dikirim.",
+      });
     }
-    console.log(`[LOG] Admin ditemukan: ${admin.username} (Email: ${admin.email})`);
+    console.log(
+      `[LOG] Admin ditemukan: ${admin.username} (Email: ${admin.email})`
+    );
 
     const resetToken = crypto.randomBytes(20).toString("hex");
     const passwordResetExpires = new Date(Date.now() + 3600000);
@@ -112,9 +169,9 @@ app.post('/api/forgot-password', async (req, res) => {
     console.log(`[LOG] Mencoba mengirim email ke: ${admin.email}`);
 
     await transporter.sendMail({
-      to: admin.email, 
+      to: admin.email,
       from: `Admin Sambal TMK <${process.env.SENDER_EMAIL}>`,
-      subject: 'Reset Password Admin',
+      subject: "Reset Password Admin",
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
             <h2 style="color: #c0392b;">Permintaan Reset Password</h2>
@@ -135,12 +192,14 @@ app.post('/api/forgot-password', async (req, res) => {
     });
     console.log(`[LOG] Email berhasil dikirim.`);
 
-    res.json({ message: 'Jika username terdaftar, email reset telah dikirim.' });
+    res.json({
+      message: "Jika username terdaftar, email reset telah dikirim.",
+    });
   } catch (error) {
     console.error("--- ERROR DI FORGOT-PASSWORD ---");
     console.error(error);
     console.error("---------------------------------");
-    res.status(500).json({ error: 'Gagal mengirim email reset.' });
+    res.status(500).json({ error: "Gagal mengirim email reset." });
   }
 });
 
@@ -160,7 +219,11 @@ app.post("/api/reset-password/:token", async (req, res) => {
 
     if (!admin) {
       console.log(`[LOG] Token tidak valid atau kedaluwarsa.`);
-      return res.status(400).json({ error: "Token reset password tidak valid atau sudah kedaluwarsa." });
+      return res
+        .status(400)
+        .json({
+          error: "Token reset password tidak valid atau sudah kedaluwarsa.",
+        });
     }
     console.log(`[LOG] Token valid untuk admin: ${admin.username}`);
 
@@ -232,13 +295,30 @@ const authenticateToken = (req, res, next) => {
 //  BAGIAN 3: ENDPOINT ADMIN (SEMUA DI BAWAH INI PERLU LOGIN)
 // =========================================================================
 const adminRouter = express.Router();
-adminRouter.use(authenticateToken); // Terapkan penjaga ke semua rute di dalam router ini
-app.use("/api/admin", adminRouter); // Gunakan router ini untuk semua path /api/admin
+adminRouter.use(authenticateToken);
+app.use("/api/admin", adminRouter);
 
 // --- UPLOAD (ADMIN) ---
-adminRouter.post("/upload", upload.single("file"), (req, res) => {
-  if (!req.file) return res.status(400).send("Tidak ada file yang diunggah.");
-  res.status(200).json({ filePath: `/uploads/${req.file.filename}` });
+adminRouter.post("/upload", upload.single("file"), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'Tidak ada file yang diunggah.' });
+    }
+
+    try {
+        const uniqueSuffix = Date.now() + '.webp';
+        const outputPath = path.join(__dirname, 'public/uploads', uniqueSuffix);
+
+        await sharp(req.file.buffer)
+            .resize(800, 800, { fit: 'inside', withoutEnlargement: true }) 
+            .toFormat('webp', { quality: 80 })
+            .toFile(outputPath);
+
+        res.status(200).json({ filePath: `/uploads/${uniqueSuffix}` });
+
+    } catch (error) {
+        console.error("Error saat memproses gambar:", error);
+        res.status(500).json({ error: 'Gagal memproses gambar.' });
+    }
 });
 
 // --- PRODUK (ADMIN) ---
@@ -260,34 +340,90 @@ adminRouter.get("/produk/:id", async (req, res) => {
   });
   res.json(produk);
 });
-adminRouter.post("/produk", async (req, res) => {
-  const { name, level, description, imageUrl, harga } = req.body;
-  const newProduk = await prisma.produk.create({
-    data: {
-      name,
-      level: parseInt(level),
-      description,
-      imageUrl,
-      harga: parseInt(harga),
-    },
-  });
-  res.status(201).json(newProduk);
-});
-adminRouter.put("/produk/:id", async (req, res) => {
-  const { id } = req.params;
-  const { name, level, description, imageUrl, harga } = req.body;
-  const updatedProduk = await prisma.produk.update({
-    where: { id: parseInt(id) },
-    data: {
-      name,
-      level: parseInt(level),
-      description,
-      imageUrl,
-      harga: parseInt(harga),
-    },
-  });
-  res.json(updatedProduk);
-});
+adminRouter.post(
+  "/produk",
+  [
+    body("name")
+      .notEmpty()
+      .withMessage("Nama tidak boleh kosong")
+      .trim()
+      .escape(),
+    body("description")
+      .notEmpty()
+      .withMessage("Deskripsi tidak boleh kosong")
+      .trim()
+      .escape(),
+    body("level")
+      .isInt({ min: 1, max: 5 })
+      .withMessage("Level pedas harus antara 1 dan 5"),
+    body("harga").isInt({ min: 0 }).withMessage("Harga tidak boleh negatif"),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, level, description, imageUrl, harga } = req.body;
+    try {
+      const newProduk = await prisma.produk.create({
+        data: {
+          name,
+          level: parseInt(level),
+          description,
+          imageUrl,
+          harga: parseInt(harga),
+        },
+      });
+      res.status(201).json(newProduk);
+    } catch (error) {
+      res.status(500).json({ error: "Gagal membuat produk baru" });
+    }
+  }
+);
+adminRouter.put(
+  "/produk/:id",
+  [
+    body("name")
+      .notEmpty()
+      .withMessage("Nama tidak boleh kosong")
+      .trim()
+      .escape(),
+    body("description")
+      .notEmpty()
+      .withMessage("Deskripsi tidak boleh kosong")
+      .trim()
+      .escape(),
+    body("level")
+      .isInt({ min: 1, max: 5 })
+      .withMessage("Level pedas harus antara 1 dan 5"),
+    body("harga").isInt({ min: 0 }).withMessage("Harga tidak boleh negatif"),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const { name, level, description, imageUrl, harga } = req.body;
+    try {
+      const updatedProduk = await prisma.produk.update({
+        where: { id: parseInt(id) },
+        data: {
+          name,
+          level: parseInt(level),
+          description,
+          imageUrl,
+          harga: parseInt(harga),
+        },
+      });
+      res.json(updatedProduk);
+    } catch (error) {
+      res.status(500).json({ error: "Gagal memperbarui produk" });
+    }
+  }
+);
 adminRouter.delete("/produk/:id", async (req, res) => {
   await prisma.produk.delete({ where: { id: parseInt(req.params.id) } });
   res.status(204).send();
@@ -336,7 +472,7 @@ adminRouter.delete("/testimoni/:id", async (req, res) => {
 // --- BANNER (ADMIN) ---
 adminRouter.get("/banners", async (req, res) => {
   const banners = await prisma.popupBanner.findMany({
-    orderBy: { id: "desc" },
+    orderBy: { id: "asc" },
   });
   res.json(banners);
 });

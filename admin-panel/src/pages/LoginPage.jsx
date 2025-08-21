@@ -87,7 +87,6 @@ const LoginPage = () => {
                     </form>
                     
                     <div className="has-text-centered mt-4">
-                        {/* 2. Ganti <a> dengan <Link> */}
                         <Link to="/forgot-password" className="is-size-5">Lupa password?</Link>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { fetchWithAuth } from '../utils/api'; // Pastikan helper diimpor
+import { fetchWithAuth } from '../utils/api';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -20,7 +20,6 @@ const ProductForm = () => {
 
     useEffect(() => {
         if (isEditing) {
-            // Gunakan fetchWithAuth untuk mengambil data
             fetchWithAuth(`/api/admin/produk/${id}`)
                 .then(data => {
                     if (data) {
@@ -49,7 +48,7 @@ const ProductForm = () => {
             setSelectedFile(e.target.files[0]);
         }
     };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -65,19 +64,20 @@ const ProductForm = () => {
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData,
                 });
-                if (!uploadRes.ok) throw new Error('Upload failed');
                 const uploadData = await uploadRes.json();
+                if (!uploadRes.ok) {
+                    throw new Error(uploadData.error || 'Upload gagal');
+                }
+
                 finalImageUrl = uploadData.filePath;
             } catch (error) {
-                toast.error("Gagal mengunggah gambar.");
+                toast.error(error.message);
                 setIsSubmitting(false);
                 return;
             }
         }
 
         const productData = { name, level: parseInt(level), description, imageUrl: finalImageUrl, harga: parseInt(harga) };
-        
-        // PERUBAHAN UTAMA: Tambahkan '/admin' ke URL
         const url = isEditing ? `/api/admin/produk/${id}` : `/api/admin/produk`;
         const method = isEditing ? 'PUT' : 'POST';
 
@@ -109,29 +109,29 @@ const ProductForm = () => {
                     <div className="field">
                         <label className="label">Nama Produk</label>
                         <div className="control">
-                           <input className="input" type="text" value={name} onChange={e => setName(e.target.value)} required />
+                            <input className="input" type="text" value={name} onChange={e => setName(e.target.value)} required />
                         </div>
                     </div>
                     <div className="field">
                         <label className="label">Level Pedas</label>
                         <div className="control">
-                            <input 
-                                className="input" 
-                                type="number" 
-                                value={level} 
-                                onChange={e => setLevel(e.target.value)} 
-                                min="1" max="5" 
-                                required 
+                            <input
+                                className="input"
+                                type="number"
+                                value={level}
+                                onChange={e => setLevel(e.target.value)}
+                                min="1" max="5"
+                                required
                             />
                         </div>
                     </div>
                     <div className="field">
                         <label className="label">Deskripsi</label>
                         <div className="control">
-                           <textarea 
-                                className="textarea" 
-                                value={description} 
-                                onChange={handleDescriptionChange} 
+                            <textarea
+                                className="textarea"
+                                value={description}
+                                onChange={handleDescriptionChange}
                                 maxLength="100"
                                 required
                             ></textarea>
@@ -141,7 +141,15 @@ const ProductForm = () => {
                     <div className="field">
                         <label className="label">Harga (Rupiah)</label>
                         <div className="control">
-                            <input className="input" type="number" placeholder="Contoh: 25000" value={harga} onChange={e => setHarga(e.target.value)} required />
+                            <input
+                                className="input"
+                                type="number"
+                                placeholder="Contoh: 25000"
+                                value={harga}
+                                onChange={e => setHarga(e.target.value)}
+                                min="0"
+                                required
+                            />
                         </div>
                     </div>
                     <div className="field">
@@ -157,21 +165,26 @@ const ProductForm = () => {
                             )}
                         </div>
                         <div className="control">
-                            <input className="input" type="file" onChange={handleFileChange} />
+                            <input
+                                className="input"
+                                type="file"
+                                onChange={handleFileChange}
+                                accept="image/png, image/jpeg, image/webp"
+                            />
                         </div>
                         <p className="help">{isEditing ? 'Pilih file baru untuk mengganti gambar di atas.' : 'Pilih file untuk diunggah.'}</p>
                     </div>
                     <div className="field is-grouped mt-5">
-                       <div className="control">
-                           <button type="submit" className={`button is-link ${isSubmitting ? 'is-loading' : ''}`} disabled={isSubmitting}>
-                               Simpan
-                           </button>
-                       </div>
-                       <div className="control">
-                           <button type="button" className="button is-link is-light" onClick={() => navigate('/produk')}>
-                               Batal
-                           </button>
-                       </div>
+                        <div className="control">
+                            <button type="submit" className={`button is-link ${isSubmitting ? 'is-loading' : ''}`} disabled={isSubmitting}>
+                                Simpan
+                            </button>
+                        </div>
+                        <div className="control">
+                            <button type="button" className="button is-link is-light" onClick={() => navigate('/produk')}>
+                                Batal
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

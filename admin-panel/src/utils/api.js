@@ -1,4 +1,4 @@
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const fetchWithAuth = async (endpoint, options = {}) => {
     const token = localStorage.getItem('authToken');

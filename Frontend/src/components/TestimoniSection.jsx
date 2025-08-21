@@ -44,8 +44,8 @@ const TestimoniSection = () => {
     const [visibleCount, setVisibleCount] = useState(isMobile ? 3 : 6);
 
     const renderContent = () => {
-        if (isLoading) return <p>Memuat testimoni...</p>;
-        if (error) return <p>Terjadi kesalahan saat memuat data.</p>;
+        if (isLoading) return <p className="subtitle is-5 has-text-grey has-text-centered">Memuat testimoni...</p>;
+        if (error) return <p className="subtitle is-5 has-text-grey has-text-centered">Terjadi kesalahan saat memuat data.</p>;
 
         const allTestimonials = responseData && responseData.data ? responseData.data : responseData || [];
 

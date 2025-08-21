@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import toast from 'react-hot-toast';
 import * as FaIcons from 'react-icons/fa';
-import { fetchWithAuth } from '../utils/api'; // Pastikan helper diimpor
+import { fetchWithAuth } from '../utils/api';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SettingsPage = () => {
     const { mutate } = useSWRConfig();
-    
-    // PERUBAHAN: Ganti URL ke endpoint admin
+
     const { data: settings, error: settingsError } = useSWR('/api/admin/settings', fetchWithAuth);
     const { data: socialLinks, error: socialError } = useSWR('/api/admin/social-media-links', fetchWithAuth);
 
@@ -18,7 +17,7 @@ const SettingsPage = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [isBrandingSubmitting, setIsBrandingSubmitting] = useState(false);
-    
+
     const [platform, setPlatform] = useState('Instagram');
     const [userInput, setUserInput] = useState('');
     const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
@@ -29,7 +28,7 @@ const SettingsPage = () => {
             setLogoImageUrl(settings.logoImageUrl || '');
         }
     }, [settings]);
-    
+
     useEffect(() => {
         if (!selectedFile) {
             setPreviewUrl('');
@@ -39,6 +38,12 @@ const SettingsPage = () => {
         setPreviewUrl(objectUrl);
         return () => URL.revokeObjectURL(objectUrl);
     }, [selectedFile]);
+
+    const handleBrandNameChange = (e) => {
+        if (e.target.value.length <= 20) {
+            setBrandName(e.target.value);
+        }
+    };
 
     const handleSettingsSubmit = async (e) => {
         e.preventDefault();
@@ -65,7 +70,6 @@ const SettingsPage = () => {
         }
 
         try {
-            // PERUBAHAN: Ganti URL ke endpoint admin
             await fetchWithAuth('/api/admin/settings', {
                 method: 'PUT',
                 body: JSON.stringify({ brandName, logoImageUrl: finalImageUrl }),
@@ -79,7 +83,6 @@ const SettingsPage = () => {
         }
     };
 
-
     const handleSocialSubmit = async (e) => {
         e.preventDefault();
         if (!userInput) {
@@ -88,7 +91,6 @@ const SettingsPage = () => {
         }
         setIsSocialSubmitting(true);
 
-        // Logika untuk membangun URL lengkap dari input user
         let finalUrl = userInput;
         const platformLower = platform.toLowerCase();
         if (platformLower === 'whatsapp') {
@@ -109,7 +111,6 @@ const SettingsPage = () => {
         if (platform === 'Lazada') iconName = 'FaShoppingCart';
 
         try {
-            // PERUBAHAN: Ganti URL ke endpoint admin
             await fetchWithAuth('/api/admin/social-media-links', {
                 method: 'POST',
                 body: JSON.stringify({ platform, url: finalUrl, iconName }),
@@ -126,7 +127,6 @@ const SettingsPage = () => {
 
     const handleDeleteSocial = async (id) => {
         if (window.confirm('Yakin ingin menghapus link ini?')) {
-            // PERUBAHAN: Ganti URL ke endpoint admin
             await fetchWithAuth(`/api/admin/social-media-links/${id}`, { method: 'DELETE' });
             toast.success('Link berhasil dihapus.');
             mutate('/api/admin/social-media-links');
@@ -147,8 +147,15 @@ const SettingsPage = () => {
                             <div className="field">
                                 <label className="label">Nama Brand</label>
                                 <div className="control">
-                                    <input className="input" type="text" value={brandName} onChange={e => setBrandName(e.target.value)} />
+                                    <input
+                                        className="input"
+                                        type="text"
+                                        value={brandName}
+                                        onChange={handleBrandNameChange}
+                                        maxLength="20"
+                                    />
                                 </div>
+                                <p className="help has-text-right">{brandName.length} / 20</p>
                             </div>
                             <div className="field">
                                 <label className="label">Gambar Logo</label>

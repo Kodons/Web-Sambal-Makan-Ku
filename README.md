@@ -4,6 +4,9 @@
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![Bulma](https://img.shields.io/badge/Bulma-00D1B2?style=flat-square&logo=bulma&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=flat-square&logo=Prisma&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat-square&logo=vite&logoColor=FFD62E)
 
 Selamat datang di repositori "Sambal Teman Makan Ku"! Ini adalah proyek aplikasi web full-stack yang dirancang untuk brand produk sambal khas Lombok. Aplikasi ini terdiri dari tiga bagian utama yang bekerja secara terpisah namun terintegrasi: sebuah **Landing Page**, **Back-end API**, dan **Admin Panel**.
 

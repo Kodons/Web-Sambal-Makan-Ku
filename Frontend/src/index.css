@@ -120,19 +120,6 @@ body {
   padding-bottom: 2rem;
 }
 
-/* Di layar mobile, garisnya horizontal */
-@media screen and (max-width: 768px) {
-  .steps-container .step-item:not(:last-child)::after {
-    left: 50px; /* Posisi awal garis */
-    right: -2rem; /* Posisi akhir garis */
-    top: 25px;
-    bottom: auto;
-    width: auto;
-    height: 2px;
-    transform: translateY(-50%);
-  }
-}
-
 /* --- Section Testimoni (Slider) --- */
 /* Mengatur tinggi tetap slider di mobile agar tidak "goyang" */
 @media (max-width: 767px) {

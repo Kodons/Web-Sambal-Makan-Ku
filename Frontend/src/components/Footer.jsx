@@ -20,45 +20,44 @@ const Footer = () => {
   return (
     <footer className="footer has-background-dark has-text-light pt-6">
       <div className="container">
-        <div className="columns">
+        <div className="columns is-vcentered">
 
           {/* Kolom 1: Tentang Brand & Sosial Media */}
-          <div className="column is-4">
+          <div className="column is-6">
            <div className="mb-4">
-                <a href="#" className="is-flex is-align-items-center">
-                    <span className="icon is-medium has-text-danger mr-2">
-                        <FaIcons.FaFire size="1.5em"/>
-                    </span>
-                    <span className="has-text-weight-bold is-size-4 has-text-white">
-                        {settings ? settings.brandName : 'Sambal Teman Makan Ku'}
-                    </span>
-                </a>
-            </div>
-            <p className="is-size-6 has-text-grey-light">
-                Sambal rumahan dengan resep warisan, dibuat dari bahan-bahan segar pilihan untuk ledakan rasa di setiap cocolan.
+               <a href="/" className="is-flex is-align-items-center">
+                   <span className="icon is-medium has-text-danger mr-2">
+                       <FaIcons.FaFire size="1.5em"/>
+                   </span>
+                   <span className="has-text-weight-bold is-size-4 has-text-white">
+                       {settings ? settings.brandName : 'Sambal Teman Makan Ku'}
+                   </span>
+               </a>
+           </div>
+            <p className="is-size-6 has-text-grey-light pr-6">
+              Sambal rumahan dengan resep warisan, dibuat dari bahan-bahan segar pilihan untuk ledakan rasa di setiap cocolan.
             </p>
             <div className="mt-5">
-                {socialLinks.map(link => {
-                    const IconComponent = FaIcons[link.iconName];
-                    return (
-                        <a 
-                            key={link.id} 
-                            href={link.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            aria-label={link.platform} 
-                            className="icon is-medium mr-3"
-                        >
-                            {/* Render komponen ikon jika ditemukan */}
-                            {IconComponent ? <IconComponent size="1.5em" /> : null}
-                        </a>
-                    );
-                })}
+              {socialLinks.map(link => {
+                  const IconComponent = FaIcons[link.iconName];
+                  return (
+                      <a 
+                          key={link.id} 
+                          href={link.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          aria-label={link.platform} 
+                          className="icon is-medium mr-3"
+                      >
+                          {IconComponent ? <IconComponent size="1.5em" /> : null}
+                      </a>
+                  );
+              })}
             </div>
           </div>
 
-          {/* Kolom 2: Link Navigasi Cepat */}
-          <div className="column is-2">
+          {/* Kolom 2: Link Navigasi Cepat (Pindah ke Kanan) */}
+          <div className="column is-6 has-text-right-desktop">
             <h6 className="title is-5 has-text-white">Navigasi</h6>
             <ul>
               <li><a href="#tentang">Tentang Kami</a></li>
@@ -68,27 +67,11 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Kolom 3: Langganan Promo */}
-          <div className="column is-5 is-offset-1">
-            <h6 className="title is-5 has-text-white">Langganan Info Promo</h6>
-            <p className="has-text-grey-light mb-4">Dapatkan info diskon dan produk terbaru langsung di email Anda.</p>
-            <div className="field has-addons">
-              <div className="control is-expanded">
-                <input className="input is-medium" type="email" placeholder="Email Anda" />
-              </div>
-              <div className="control">
-                <a className="button is-danger is-medium has-text-weight-bold">
-                  Langganan
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
 
        <div className="content has-text-centered pt-6 pb-2">
             <p className="is-size-7 has-text-grey-light">
-                {/* PERUBAHAN: Tampilkan nama brand dari API */}
-                &copy; {year} <strong>{settings ? settings.brandName : 'Sambal Juara'}</strong>. All Rights Reserved.
+              &copy; {year} <strong>{settings ? settings.brandName : 'Sambal Juara'}</strong>. All Rights Reserved.
             </p>
         </div>
 

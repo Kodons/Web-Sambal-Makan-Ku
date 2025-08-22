@@ -10,9 +10,9 @@ const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const { body, validationResult } = require("express-validator");
 const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
 const sharp = require('sharp');
 const fs = require('fs');
+const compression = require('compression');
 
 // =========================================================================
 //  KONFIGURASI DASAR
@@ -23,29 +23,11 @@ const PORT = 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // --- MIDDLEWARE ---
-app.use(helmet({ crossOriginResourcePolicy: false }));
-
-// 2. Konfigurasi dan terapkan CORS yang aman
-const whitelist = [
-    'http://localhost:5173', // Alamat Landing Page (development)
-    'http://localhost:5174', // Alamat Admin Panel (development)
-    'http://localhost:3000'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Tidak diizinkan oleh CORS'));
-    }
-  }
-};
-app.use(cors(corsOptions));
-
-// 3. Middleware lain setelah keamanan
+app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(compression());
+
 
 // --- KONFIGURASI UPLOAD (MULTER) ---
 const storage = multer.memoryStorage(); 
@@ -65,10 +47,10 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 // --- KONFIGURASI RATE LIMITER ---
 const authLimiter = rateLimit({
-	windowMs: 15 * 60 * 1000,
-	max: 10,
-	standardHeaders: true,
-	legacyHeaders: false,
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
     message: { error: 'Terlalu banyak percobaan, silakan coba lagi setelah 15 menit' }
 });
 

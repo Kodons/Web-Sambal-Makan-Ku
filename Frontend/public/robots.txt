@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+# Jangan crawl folder admin
+Disallow: /admin/

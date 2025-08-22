@@ -29,10 +29,7 @@ const ProductCard = ({ product }) => (
                 </p>
             </div>
             <footer className="card-footer">
-                <div className="card-footer-item">
-                    <a href="#" className="button is-danger is-outlined"><span>Pesan Ini</span></a>
-                </div>
-                <div className="card-footer-item">
+                <div className="card-footer-item is-justify-content-center">
                     <div className="is-flex">
                         {Array.from({ length: 5 }).map((_, i) => (
                             <span key={i} className="icon is-small">
@@ -56,16 +53,19 @@ const ProdukSection = () => {
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/produk?all=true`);
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/produk`);
                 const responseData = await response.json();
-                if (responseData && Array.isArray(responseData.data)) {
-                    setAllProducts(responseData.data);
-                } else {
+                
+                if (Array.isArray(responseData)) {
                     setAllProducts(responseData);
+                } else {
+                    console.error("Format data tidak sesuai, diharapkan array.", responseData);
+                    setAllProducts([]); 
                 }
 
             } catch (error) {
                 console.error("Gagal mengambil data produk:", error);
+                setAllProducts([]);
             } finally {
                 setIsLoading(false);
             }
@@ -106,13 +106,13 @@ const ProdukSection = () => {
                                 <ul className="pagination-list">
                                     {Array.from({ length: totalPages }, (_, i) => (
                                         <li key={i + 1}>
-                                            <a
+                                            <button
                                                 className={`pagination-link ${currentPage === i + 1 ? 'is-current' : ''}`}
                                                 aria-label={`Goto page ${i + 1}`}
                                                 onClick={() => paginate(i + 1)}
                                             >
                                                 {i + 1}
-                                            </a>
+                                            </button>
                                         </li>
                                     ))}
                                 </ul>

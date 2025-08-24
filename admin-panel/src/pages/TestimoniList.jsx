@@ -1,33 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { FaSearch } from 'react-icons/fa';
 import Pagination from '../components/Pagination';
 import { fetchWithAuth } from '../utils/api';
+
+// Hook custom untuk debounce (menunda eksekusi)
+function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
+}
 
 const TestimoniList = () => {
     const [testimonis, setTestimonis] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
     const testimonialsPerPage = 10;
+
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    const searchInputRef = useRef(null);
 
     useEffect(() => {
         setIsLoading(true);
-        fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`)
+        fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}&search=${debouncedSearchTerm}`)
             .then(response => {
                 setTestimonis(response.data);
                 setTotalPages(Math.ceil(response.total / testimonialsPerPage));
             })
             .catch(error => toast.error(error.message))
             .finally(() => setIsLoading(false));
-    }, [currentPage]);
+    }, [currentPage, debouncedSearchTerm]);
+
+    useEffect(() => {
+        if (!isLoading && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [isLoading]);
 
     const handleDelete = async (id) => {
         if (window.confirm('Anda yakin ingin menghapus testimoni ini?')) {
             try {
                 await fetchWithAuth(`/api/admin/testimoni/${id}`, { method: 'DELETE' });
                 toast.success('Testimoni berhasil dihapus!');
-                const response = await fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}`);
+                // Muat ulang data
+                const response = await fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}&search=${debouncedSearchTerm}`);
                 setTestimonis(response.data);
                 setTotalPages(Math.ceil(response.total / testimonialsPerPage));
             } catch (error) {
@@ -36,15 +62,29 @@ const TestimoniList = () => {
         }
     };
 
-    if (isLoading) {
+    if (isLoading && testimonis.length === 0) {
         return <progress className="progress is-small is-primary" max="100"></progress>;
     }
 
     return (
         <div>
-            <div className="level">
+            <div className="level mb-5">
                 <div className="level-left">
-                    <h1 className="title">Manajemen Testimoni</h1>
+                    <div className="field">
+                        <div className="control has-icons-left">
+                            <input
+                                ref={searchInputRef}
+                                className="input"
+                                type="text"
+                                placeholder="Cari testimoni..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <span className="icon is-small is-left">
+                                <FaSearch />
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div className="level-right">
                     <Link to="/testimoni/baru" className="button is-primary">
@@ -84,7 +124,7 @@ const TestimoniList = () => {
                     </tbody>
                 </table>
             </div>
-            
+
             <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

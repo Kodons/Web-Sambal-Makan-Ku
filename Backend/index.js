@@ -9,10 +9,10 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const { body, validationResult } = require("express-validator");
-const rateLimit = require('express-rate-limit');
-const sharp = require('sharp');
-const fs = require('fs');
-const compression = require('compression');
+const rateLimit = require("express-rate-limit");
+const sharp = require("sharp");
+const fs = require("fs");
+const compression = require("compression");
 
 // =========================================================================
 //  KONFIGURASI DASAR
@@ -28,16 +28,15 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(compression());
 
-
 // --- KONFIGURASI UPLOAD (MULTER) ---
-const storage = multer.memoryStorage(); 
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-    } else {
-        cb(new Error('Hanya file gambar yang diizinkan!'), false);
-    }
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Hanya file gambar yang diizinkan!"), false);
+  }
 };
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
@@ -51,19 +50,23 @@ const authLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-    message: { error: 'Terlalu banyak percobaan, silakan coba lagi setelah 15 menit' }
+  message: {
+    error: "Terlalu banyak percobaan, silakan coba lagi setelah 15 menit",
+  },
 });
 
 // --- AUTENTIKASI ---
-app.post('/api/register', authLimiter, async (req, res) => {
+app.post("/api/register", authLimiter, async (req, res) => {
   const { username, password, email } = req.body;
 
   if (!username || !password || !email) {
-    return res.status(400).json({ error: "Username, password, dan email diperlukan" });
+    return res
+      .status(400)
+      .json({ error: "Username, password, dan email diperlukan" });
   }
-  
+
   const hashedPassword = await bcrypt.hash(password, 10);
-  
+
   try {
     const admin = await prisma.admin.create({
       data: {
@@ -76,8 +79,8 @@ app.post('/api/register', authLimiter, async (req, res) => {
       .status(201)
       .json({ message: "Admin berhasil dibuat", userId: admin.id });
   } catch (error) {
-    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
-        return res.status(400).json({ error: "Email sudah terdaftar" });
+    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+      return res.status(400).json({ error: "Email sudah terdaftar" });
     }
     res.status(400).json({ error: "Username sudah ada" });
   }
@@ -201,11 +204,9 @@ app.post("/api/reset-password/:token", async (req, res) => {
 
     if (!admin) {
       console.log(`[LOG] Token tidak valid atau kedaluwarsa.`);
-      return res
-        .status(400)
-        .json({
-          error: "Token reset password tidak valid atau sudah kedaluwarsa.",
-        });
+      return res.status(400).json({
+        error: "Token reset password tidak valid atau sudah kedaluwarsa.",
+      });
     }
     console.log(`[LOG] Token valid untuk admin: ${admin.username}`);
 
@@ -282,25 +283,24 @@ app.use("/api/admin", adminRouter);
 
 // --- UPLOAD (ADMIN) ---
 adminRouter.post("/upload", upload.single("file"), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'Tidak ada file yang diunggah.' });
-    }
+  if (!req.file) {
+    return res.status(400).json({ error: "Tidak ada file yang diunggah." });
+  }
 
-    try {
-        const uniqueSuffix = Date.now() + '.webp';
-        const outputPath = path.join(__dirname, 'public/uploads', uniqueSuffix);
+  try {
+    const uniqueSuffix = Date.now() + ".webp";
+    const outputPath = path.join(__dirname, "public/uploads", uniqueSuffix);
 
-        await sharp(req.file.buffer)
-            .resize(800, 800, { fit: 'inside', withoutEnlargement: true }) 
-            .toFormat('webp', { quality: 80 })
-            .toFile(outputPath);
+    await sharp(req.file.buffer)
+      .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+      .toFormat("webp", { quality: 80 })
+      .toFile(outputPath);
 
-        res.status(200).json({ filePath: `/uploads/${uniqueSuffix}` });
-
-    } catch (error) {
-        console.error("Error saat memproses gambar:", error);
-        res.status(500).json({ error: 'Gagal memproses gambar.' });
-    }
+    res.status(200).json({ filePath: `/uploads/${uniqueSuffix}` });
+  } catch (error) {
+    console.error("Error saat memproses gambar:", error);
+    res.status(500).json({ error: "Gagal memproses gambar." });
+  }
 });
 
 // --- PRODUK (ADMIN) ---
@@ -308,13 +308,26 @@ adminRouter.get("/produk", async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
-  const produk = await prisma.produk.findMany({
-    skip,
-    take: limit,
-    orderBy: { id: "asc" },
-  });
-  const totalProduk = await prisma.produk.count();
-  res.json({ data: produk, total: totalProduk });
+  const searchTerm = req.query.search || "";
+
+  const whereClause = {
+    name: {
+      contains: searchTerm,
+    },
+  };
+
+  try {
+    const produk = await prisma.produk.findMany({
+      skip,
+      take: limit,
+      where: whereClause,
+      orderBy: { id: "asc" },
+    });
+    const totalProduk = await prisma.produk.count({ where: whereClause });
+    res.json({ data: produk, total: totalProduk });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal mengambil data produk admin" });
+  }
 });
 adminRouter.get("/produk/:id", async (req, res) => {
   const produk = await prisma.produk.findUnique({
@@ -416,13 +429,26 @@ adminRouter.get("/testimoni", async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
-  const testimoni = await prisma.testimoni.findMany({
-    skip,
-    take: limit,
-    orderBy: { id: "asc" },
-  });
-  const totalTestimoni = await prisma.testimoni.count();
-  res.json({ data: testimoni, total: totalTestimoni });
+  const searchTerm = req.query.search || "";
+
+  const whereClause = {
+    name: {
+      contains: searchTerm,
+    },
+  };
+
+  try {
+    const testimoni = await prisma.testimoni.findMany({
+      skip,
+      take: limit,
+      where: whereClause, // Terapkan filter
+      orderBy: { id: "asc" },
+    });
+    const totalTestimoni = await prisma.testimoni.count({ where: whereClause });
+    res.json({ data: testimoni, total: totalTestimoni });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal mengambil data testimoni admin" });
+  }
 });
 adminRouter.get("/testimoni/:id", async (req, res) => {
   const testimoni = await prisma.testimoni.findUnique({

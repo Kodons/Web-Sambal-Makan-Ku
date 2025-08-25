@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CartProvider } from './context/CartContext';
+import { Toaster } from 'react-hot-toast';
+
+// Impor semua komponen dan halaman
 import Navbar from './components/Navbar.jsx';
 import HeroSection from './components/HeroSection.jsx';
 import KeunggulanSection from './components/KeunggulanSection.jsx';
@@ -8,12 +13,29 @@ import TestimoniSection from './components/TestimoniSection.jsx';
 import KontakSection from './components/KontakSection.jsx';
 import Footer from './components/Footer.jsx';
 import WelcomePopup from './components/WelcomePopup.jsx';
+import FloatingCartButton from './components/FloatingCartButton.jsx';
+import CartSidebar from './components/CartSidebar.jsx';
+import Checkout from './components/Checkout.jsx';
+import DetailOrder from './components/DetailOrder.jsx';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+// Komponen untuk mengelompokkan semua section di halaman utama
+const LandingPage = () => (
+  <>
+    <HeroSection />
+    <KeunggulanSection />
+    <ProdukSection />
+    <HowToOrder />
+    <TestimoniSection />
+    <KontakSection />
+  </>
+);
 
 function App() {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [popupImageUrl, setPopupImageUrl] = useState('');
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     async function fetchPopupData() {
@@ -29,7 +51,7 @@ function App() {
       }
     }
 
-    const hasBeenShown = localStorage.getItem('popupHasBeenShown');
+    const hasBeenShown = sessionStorage.getItem('popupHasBeenShown');
     if (!hasBeenShown) {
       fetchPopupData();
     }
@@ -37,24 +59,37 @@ function App() {
 
   const handleClosePopup = () => {
     setIsPopupVisible(false);
+    sessionStorage.setItem('popupHasBeenShown', 'true');
   };
 
   return (
+    <CartProvider>
+      {/* 1. Bungkus semua dengan Router */}
+      <Router>
+        <div className='page-wrapper'>
+          <Toaster position="bottom-center" />
 
-    <div className='page-wrapper'>
-      {isPopupVisible && popupImageUrl && <WelcomePopup onClose={handleClosePopup} imageUrl={popupImageUrl} />}
+          {isPopupVisible && popupImageUrl && <WelcomePopup onClose={handleClosePopup} imageUrl={popupImageUrl} />}
 
-      <div className="content-wrap">
-        <Navbar />
-        <HeroSection />
-        <KeunggulanSection />
-        <ProdukSection />
-        <HowToOrder />
-        <TestimoniSection />
-        <KontakSection />
-      </div>
-      <Footer />
-    </div>
+          <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+          <div className="content-wrap">
+            {/* Navbar & Footer di luar Routes agar selalu tampil */}
+            <Navbar />
+
+            {/* 2. Gunakan Routes untuk mendefinisikan halaman */}
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/pesanan-berhasil" element={<DetailOrder />} />
+            </Routes>
+          </div>
+
+          <Footer />
+          <FloatingCartButton onCartClick={() => setIsCartOpen(true)} />
+        </div>
+      </Router>
+    </CartProvider>
   );
 }
 

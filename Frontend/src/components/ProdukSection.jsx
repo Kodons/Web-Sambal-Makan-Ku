@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaPepperHot } from 'react-icons/fa6';
+import { FaPepperHot, FaCartShopping } from 'react-icons/fa6';
+import { useCart } from '../context/CartContext'; // BARU: Impor hook keranjang
+import toast from 'react-hot-toast'; // BARU: Impor untuk notifikasi
 
-const ProductCard = ({ product }) => (
+// --- Komponen ProductCard (dengan tombol) ---
+const ProductCard = ({ product, onAddToCart }) => (
     <motion.div
         key={product.id}
         className="column is-one-quarter-desktop is-half-tablet"
@@ -29,8 +32,9 @@ const ProductCard = ({ product }) => (
                 </p>
             </div>
             <footer className="card-footer">
-                <div className="card-footer-item is-justify-content-center">
-                    <div className="is-flex">
+                <div className="card-footer-item">
+                    <span>Level Pedas:</span>
+                    <div className="is-flex ml-2">
                         {Array.from({ length: 5 }).map((_, i) => (
                             <span key={i} className="icon is-small">
                                 <FaPepperHot className={i < product.level ? 'has-text-danger' : 'has-text-grey-lighter'} />
@@ -38,17 +42,32 @@ const ProductCard = ({ product }) => (
                         ))}
                     </div>
                 </div>
+                <div className="card-footer-item">
+                    <button 
+                        className="button is-danger is-fullwidth"
+                        onClick={() => onAddToCart(product)}
+                    >
+                        <span className="icon">
+                            <FaCartShopping />
+                        </span>
+                        <span>Beli</span>
+                    </button>
+                </div>
             </footer>
         </div>
     </motion.div>
 );
 
 
+// --- Komponen ProdukSection (dengan logika keranjang) ---
 const ProdukSection = () => {
     const [allProducts, setAllProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 4;
+
+    // BARU: Ambil fungsi addToCart dari CartContext
+    const { addToCart } = useCart(); 
 
     useEffect(() => {
         async function fetchProducts() {
@@ -62,7 +81,6 @@ const ProdukSection = () => {
                     console.error("Format data tidak sesuai, diharapkan array.", responseData);
                     setAllProducts([]); 
                 }
-
             } catch (error) {
                 console.error("Gagal mengambil data produk:", error);
                 setAllProducts([]);
@@ -79,6 +97,12 @@ const ProdukSection = () => {
     const totalPages = Math.ceil(allProducts.length / productsPerPage);
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+    // BARU: Fungsi ini sekarang memanggil context dan menampilkan notifikasi
+    const handleAddToCart = (product) => {
+        addToCart(product); // Panggil fungsi dari context untuk menambah barang
+        toast.success(`${product.name} berhasil ditambahkan!`); // Tampilkan notifikasi
+    };
+
     if (isLoading) {
         return <section className="section is-medium"><progress className="progress is-small is-primary"></progress></section>;
     }
@@ -87,9 +111,8 @@ const ProdukSection = () => {
         <section
             id="produk"
             className="section has-background-light is-flex is-align-items-center"
-            style={{
-                minHeight: '100vh'
-            }}>
+            style={{ minHeight: '100vh' }}
+        >
             <div className="container has-text-centered">
                 <h2 className="title is-2 has-text-black">Varian Jawara Kami</h2>
                 <p className="subtitle is-5 has-text-grey mb-6">Pilih tingkat kepedasan favoritmu.</p>
@@ -98,24 +121,29 @@ const ProdukSection = () => {
                     <>
                         <motion.div className="columns is-centered is-multiline">
                             {currentProducts.map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                                <ProductCard 
+                                    key={product.id} 
+                                    product={product} 
+                                    onAddToCart={handleAddToCart} 
+                                />
                             ))}
                         </motion.div>
+                        
                         {totalPages > 1 && (
                             <nav className="pagination is-centered is-rounded mt-6 product-pagination" role="navigation" aria-label="pagination">
-                                <ul className="pagination-list">
-                                    {Array.from({ length: totalPages }, (_, i) => (
-                                        <li key={i + 1}>
-                                            <button
-                                                className={`pagination-link ${currentPage === i + 1 ? 'is-current' : ''}`}
-                                                aria-label={`Goto page ${i + 1}`}
-                                                onClick={() => paginate(i + 1)}
-                                            >
-                                                {i + 1}
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
+                               <ul className="pagination-list">
+                                   {Array.from({ length: totalPages }, (_, i) => (
+                                       <li key={i + 1}>
+                                           <button
+                                               className={`pagination-link ${currentPage === i + 1 ? 'is-current' : ''}`}
+                                               aria-label={`Goto page ${i + 1}`}
+                                               onClick={() => paginate(i + 1)}
+                                           >
+                                               {i + 1}
+                                           </button>
+                                       </li>
+                                   ))}
+                               </ul>
                             </nav>
                         )}
                     </>
@@ -124,7 +152,6 @@ const ProdukSection = () => {
                 )}
             </div>
         </section>
-
     );
 };
 

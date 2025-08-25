@@ -11,12 +11,13 @@ import BannerForm from './pages/BannerForm';
 import SettingsPage from './pages/SettingsPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+// BARU: Impor halaman manajemen pesanan
+import OrderManagement from './pages/OrderManagement'; 
 
 // Komponen untuk melindungi rute
 const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-        // Jika tidak ada token, arahkan ke halaman login
         return <Navigate to="/login" replace />;
     }
     return children;
@@ -54,6 +55,8 @@ function App() {
             <Route path="banners" element={<BannerList />} />
             <Route path="banners/baru" element={<BannerForm />} />
             <Route path="banners/edit/:id" element={<BannerForm />} />
+            
+            <Route path="pesanan" element={<OrderManagement />} />
             
             <Route path="pengaturan" element={<SettingsPage />} />
         </Route>

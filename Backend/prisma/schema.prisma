@@ -22,6 +22,7 @@ model Setting {
   id           Int     @id @default(1)
   brandName    String? @default("Sambal Juara")
   logoImageUrl String? @db.VarChar(255)
+  qrisImageUrl  String?
 }
 
 model SocialMediaLink {
@@ -46,7 +47,35 @@ model Produk {
   imageUrl    String @db.VarChar(255)
   description String @db.VarChar(100)
   harga       Int
+  orderItems OrderItem[]
 }
+
+model Order {
+  id                Int       @id @default(autoincrement())
+  serialNumber      String    @unique
+  customerName      String
+  customerAddress   String
+  customerPhone     String
+  totalAmount       Int
+  shippingCost      Int
+  // Status pesanan: PENDING, APPROVED, CANCELLED
+  status            String    @default("PENDING")
+  paymentProofUrl   String    // URL bukti pembayaran
+  adminNotes        String?   // Catatan/alasan dari admin
+  createdAt         DateTime  @default(now())
+  orderItems        OrderItem[]
+}
+
+model OrderItem {
+  id        Int    @id @default(autoincrement())
+  order     Order  @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Produk @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  price     Int
+}
+
 
 model Testimoni {
   id     Int    @id @default(autoincrement())

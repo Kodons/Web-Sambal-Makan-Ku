@@ -12,23 +12,34 @@ const SettingsPage = () => {
     const { data: settings, error: settingsError } = useSWR('/api/admin/settings', fetchWithAuth);
     const { data: socialLinks, error: socialError } = useSWR('/api/admin/social-media-links', fetchWithAuth);
 
+    // State untuk Branding
     const [brandName, setBrandName] = useState('');
     const [logoImageUrl, setLogoImageUrl] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [isBrandingSubmitting, setIsBrandingSubmitting] = useState(false);
-
+    
+    // State untuk Sosial Media
     const [platform, setPlatform] = useState('Instagram');
     const [userInput, setUserInput] = useState('');
     const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
 
+    // --- State untuk QRIS --- // BARU
+    const [qrisImageUrl, setQrisImageUrl] = useState('');
+    const [selectedQrisFile, setSelectedQrisFile] = useState(null);
+    const [qrisPreviewUrl, setQrisPreviewUrl] = useState('');
+    const [isQrisSubmitting, setIsQrisSubmitting] = useState(false);
+
+    // Mengisi state dari data API yang sudah ada
     useEffect(() => {
         if (settings) {
             setBrandName(settings.brandName || '');
             setLogoImageUrl(settings.logoImageUrl || '');
+            setQrisImageUrl(settings.qrisImageUrl || ''); // BARU
         }
     }, [settings]);
 
+    // useEffect untuk preview logo
     useEffect(() => {
         if (!selectedFile) {
             setPreviewUrl('');
@@ -38,6 +49,18 @@ const SettingsPage = () => {
         setPreviewUrl(objectUrl);
         return () => URL.revokeObjectURL(objectUrl);
     }, [selectedFile]);
+    
+    // useEffect untuk preview QRIS // BARU
+    useEffect(() => {
+        if (!selectedQrisFile) {
+            setQrisPreviewUrl('');
+            return;
+        }
+        const objectUrl = URL.createObjectURL(selectedQrisFile);
+        setQrisPreviewUrl(objectUrl);
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [selectedQrisFile]);
+
 
     const handleBrandNameChange = (e) => {
         if (e.target.value.length <= 20) {
@@ -45,6 +68,7 @@ const SettingsPage = () => {
         }
     };
 
+    // Fungsi submit untuk branding (tidak berubah)
     const handleSettingsSubmit = async (e) => {
         e.preventDefault();
         setIsBrandingSubmitting(true);
@@ -83,6 +107,45 @@ const SettingsPage = () => {
         }
     };
 
+    // --- Fungsi submit untuk QRIS --- // BARU
+    const handleQrisSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedQrisFile) {
+            toast.error("Silakan pilih file gambar QRIS baru.");
+            return;
+        }
+        setIsQrisSubmitting(true);
+        const token = localStorage.getItem('authToken');
+
+        const formData = new FormData();
+        formData.append('file', selectedQrisFile);
+
+        try {
+            // 1. Upload gambar baru
+            const uploadRes = await fetch(`${BACKEND_URL}/api/admin/upload`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData,
+            });
+            const uploadData = await uploadRes.json();
+            const newQrisUrl = uploadData.filePath;
+
+            // 2. Simpan URL baru ke settings
+            await fetchWithAuth('/api/admin/settings', {
+                method: 'PUT',
+                body: JSON.stringify({ qrisImageUrl: newQrisUrl }),
+            });
+            toast.success('Gambar QRIS berhasil diperbarui!');
+            mutate('/api/admin/settings');
+            setSelectedQrisFile(null); // Reset pilihan file
+        } catch (error) {
+            toast.error('Gagal memperbarui gambar QRIS.');
+        } finally {
+            setIsQrisSubmitting(false);
+        }
+    };
+
+    // Fungsi submit untuk sosial media (tidak berubah)
     const handleSocialSubmit = async (e) => {
         e.preventDefault();
         if (!userInput) {
@@ -109,7 +172,7 @@ const SettingsPage = () => {
         if (platform === 'TikTok') iconName = 'FaTiktok';
         if (platform === 'Shopee') iconName = 'FaShoppingBag';
         if (platform === 'Lazada') iconName = 'FaShoppingCart';
-
+        
         try {
             await fetchWithAuth('/api/admin/social-media-links', {
                 method: 'POST',
@@ -125,6 +188,7 @@ const SettingsPage = () => {
         }
     };
 
+    // Fungsi hapus sosial media (tidak berubah)
     const handleDeleteSocial = async (id) => {
         if (window.confirm('Yakin ingin menghapus link ini?')) {
             await fetchWithAuth(`/api/admin/social-media-links/${id}`, { method: 'DELETE' });
@@ -139,44 +203,46 @@ const SettingsPage = () => {
     return (
         <div>
             <h1 className="title">Pengaturan Website</h1>
-            <div className="columns">
+            <div className="columns is-multiline">
+                {/* Kolom Branding */}
                 <div className="column is-half">
                     <div className="box">
                         <h2 className="subtitle">Branding</h2>
                         <form onSubmit={handleSettingsSubmit}>
-                            <div className="field">
-                                <label className="label">Nama Brand</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        value={brandName}
-                                        onChange={handleBrandNameChange}
-                                        maxLength="20"
-                                    />
-                                </div>
-                                <p className="help has-text-right">{brandName.length} / 20</p>
-                            </div>
-                            <div className="field">
-                                <label className="label">Gambar Logo</label>
-                                <div className="mb-4">
-                                    <p>Preview:</p>
-                                    {previewUrl ? <img src={previewUrl} alt="Preview Logo" width="150" />
-                                        : logoImageUrl ? <img src={`${BACKEND_URL}${logoImageUrl}`} alt="Logo saat ini" width="150" />
-                                            : <p className="has-text-grey">Tidak ada gambar logo.</p>}
-                                </div>
-                                <div className="control">
-                                    <input className="input" type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
-                                </div>
-                            </div>
-                            <button type="submit" className={`button is-info ${isBrandingSubmitting ? 'is-loading' : ''}`} disabled={isBrandingSubmitting}>Simpan Branding</button>
+                           {/* ... form branding Anda yang sudah ada ... */}
+                           <div className="field">
+                               <label className="label">Nama Brand</label>
+                               <div className="control">
+                                   <input
+                                       className="input" type="text" value={brandName}
+                                       onChange={handleBrandNameChange} maxLength="20"
+                                   />
+                               </div>
+                               <p className="help has-text-right">{brandName.length} / 20</p>
+                           </div>
+                           <div className="field">
+                               <label className="label">Gambar Logo</label>
+                               <div className="mb-4">
+                                   <p>Preview:</p>
+                                   {previewUrl ? <img src={previewUrl} alt="Preview Logo" width="150" />
+                                       : logoImageUrl ? <img src={`${BACKEND_URL}${logoImageUrl}`} alt="Logo saat ini" width="150" />
+                                           : <p className="has-text-grey">Tidak ada gambar logo.</p>}
+                               </div>
+                               <div className="control">
+                                   <input className="input" type="file" accept="image/*" onChange={(e) => setSelectedFile(e.target.files[0])} />
+                               </div>
+                           </div>
+                           <button type="submit" className={`button is-info ${isBrandingSubmitting ? 'is-loading' : ''}`} disabled={isBrandingSubmitting}>Simpan Branding</button>
                         </form>
                     </div>
                 </div>
+
+                {/* Kolom Sosial Media */}
                 <div className="column is-half">
                     <div className="box">
                         <h2 className="subtitle">Link Sosial Media</h2>
                         <form onSubmit={handleSocialSubmit}>
+                            {/* ... form sosial media Anda yang sudah ada ... */}
                             <div className="field">
                                 <label className="label">Platform</label>
                                 <div className="control">
@@ -224,6 +290,42 @@ const SettingsPage = () => {
                         })}
                     </div>
                 </div>
+                
+                {/* --- Kolom Pengaturan QRIS --- */} {/* BARU */}
+                <div className="column is-full">
+                    <div className="box">
+                        <h2 className="subtitle">Pengaturan Pembayaran (QRIS)</h2>
+                        <form onSubmit={handleQrisSubmit}>
+                            <div className="field">
+                                <label className="label">Gambar QRIS</label>
+                                <div className="mb-4">
+                                    <p>Preview:</p>
+                                    {qrisPreviewUrl ? <img src={qrisPreviewUrl} alt="Preview QRIS" style={{ maxWidth: '250px' }} />
+                                        : qrisImageUrl ? <img src={`${BACKEND_URL}${qrisImageUrl}`} alt="QRIS saat ini" style={{ maxWidth: '250px' }} />
+                                            : <p className="has-text-grey">Tidak ada gambar QRIS.</p>}
+                                </div>
+                                <div className="control">
+                                    <div className="file has-name is-fullwidth">
+                                        <label className="file-label">
+                                            <input className="file-input" type="file" accept="image/*" onChange={(e) => setSelectedQrisFile(e.target.files[0])} />
+                                            <span className="file-cta">
+                                                <span className="file-icon"><FaIcons.FaUpload /></span>
+                                                <span className="file-label">Pilih file QRIS…</span>
+                                            </span>
+                                            <span className="file-name">
+                                                {selectedQrisFile ? selectedQrisFile.name : "Belum ada file dipilih"}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" className={`button is-success ${isQrisSubmitting ? 'is-loading' : ''}`} disabled={isQrisSubmitting || !selectedQrisFile}>
+                                Simpan Gambar QRIS
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
             </div>
         </div>
     );

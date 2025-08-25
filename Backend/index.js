@@ -232,6 +232,29 @@ app.post("/api/reset-password/:token", async (req, res) => {
   }
 });
 
+// --- ENDPOINT UPLOAD BUKTI PEMBAYARAN UNTUK PELANGGAN ---
+app.post("/api/upload-proof", upload.single("file"), async (req, res) => {
+  // Logikanya sama persis dengan /api/admin/upload
+  if (!req.file) {
+    return res.status(400).json({ error: "Tidak ada file yang diunggah." });
+  }
+
+  try {
+    const uniqueSuffix = "proof-" + Date.now() + ".webp";
+    const outputPath = path.join(__dirname, "public/uploads", uniqueSuffix);
+
+    await sharp(req.file.buffer)
+      .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+      .toFormat("webp", { quality: 80 })
+      .toFile(outputPath);
+
+    res.status(200).json({ filePath: `/uploads/${uniqueSuffix}` });
+  } catch (error) {
+    console.error("Error saat memproses bukti bayar:", error);
+    res.status(500).json({ error: "Gagal memproses gambar." });
+  }
+});
+
 // --- DATA UNTUK LANDING PAGE ---
 app.get("/api/produk", async (req, res) => {
   const allProduk = await prisma.produk.findMany({ orderBy: { id: "asc" } });
@@ -258,6 +281,64 @@ app.get("/api/social-media-links", async (req, res) => {
     orderBy: { id: "asc" },
   });
   res.json(links);
+});
+
+app.post("/api/orders", async (req, res) => {
+  const {
+    customerName,
+    customerAddress,
+    customerPhone,
+    totalAmount,
+    shippingCost,
+    paymentProofUrl,
+    items,
+  } = req.body;
+
+  // --- FUNGSI UNTUK MEMBUAT SERIAL NUMBER ---
+  const generateSerialNumber = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const randomChars = Math.random()
+      .toString(36)
+      .substring(2, 6)
+      .toUpperCase();
+    return `TMK-${year}${month}${day}-${randomChars}`;
+  };
+
+  try {
+    const newOrder = await prisma.order.create({
+      data: {
+        serialNumber: generateSerialNumber(),
+        customerName,
+        customerAddress,
+        customerPhone,
+        totalAmount: parseInt(totalAmount),
+        shippingCost: parseInt(shippingCost),
+        paymentProofUrl,
+        orderItems: {
+          create: items.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.harga,
+          })),
+        },
+      },
+      // --- SERTAKAN DETAIL ITEM DALAM RESPONS ---
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+    res.status(201).json(newOrder); // Kirim kembali data pesanan yang lengkap
+  } catch (error) {
+    console.error("Gagal membuat pesanan:", error);
+    res.status(500).json({ error: "Gagal membuat pesanan." });
+  }
 });
 
 // =========================================================================
@@ -528,7 +609,7 @@ adminRouter.get("/settings", async (req, res) => {
   const settings = await prisma.setting.upsert({
     where: { id: 1 },
     update: {},
-    create: { id: 1, brandName: "Sambal Teman Makan Ku" },
+    create: { id: 1, brandName: "Sambal Teman Makanku" },
   });
   res.json(settings);
 });
@@ -539,11 +620,11 @@ adminRouter.get("/social-media-links", async (req, res) => {
   res.json(links);
 });
 adminRouter.put("/settings", async (req, res) => {
-  const { brandName, logoImageUrl } = req.body;
+  const { brandName, logoImageUrl, qrisImageUrl } = req.body;
   const updatedSettings = await prisma.setting.upsert({
     where: { id: 1 },
-    update: { brandName, logoImageUrl },
-    create: { id: 1, brandName, logoImageUrl },
+    update: { brandName, logoImageUrl, qrisImageUrl },
+    create: { id: 1, brandName, logoImageUrl, qrisImageUrl },
   });
   res.json(updatedSettings);
 });
@@ -561,6 +642,72 @@ adminRouter.delete("/social-media-links/:id", async (req, res) => {
     where: { id: parseInt(req.params.id) },
   });
   res.status(204).send();
+});
+
+// Mengambil semua pesanan
+adminRouter.get("/orders", async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const searchTerm = req.query.search || '';
+    const skip = (page - 1) * limit;
+
+    const whereClause = {};
+
+    if (searchTerm) {
+        const orConditions = [
+            { customerName: { contains: searchTerm } },
+            { serialNumber: { contains: searchTerm } }
+        ];
+
+        const searchNumber = parseInt(searchTerm);
+        if (!isNaN(searchNumber)) {
+            orConditions.push({ id: { equals: searchNumber } });
+        }
+
+        whereClause.OR = orConditions;
+    }
+
+    try {
+        const orders = await prisma.order.findMany({
+            where: whereClause,
+            skip,
+            take: limit,
+            orderBy: { createdAt: 'desc' },
+            include: { orderItems: { include: { product: true } } },
+        });
+
+        const totalOrders = await prisma.order.count({ where: whereClause });
+        
+        res.json({ data: orders, total: totalOrders });
+    } catch (error) {
+        console.error("Error saat mencari pesanan:", error);
+        res.status(500).json({ error: "Gagal mengambil data pesanan" });
+    }
+});
+
+// Menyetujui pesanan
+adminRouter.put("/orders/:id/approve", async (req, res) => {
+  const { id } = req.params;
+  const { adminNotes } = req.body;
+  const updatedOrder = await prisma.order.update({
+    where: { id: parseInt(id) },
+    data: { status: "APPROVED", adminNotes },
+  });
+  res.json(updatedOrder);
+});
+
+// Membatalkan pesanan
+adminRouter.put("/orders/:id/cancel", async (req, res) => {
+  const { id } = req.params;
+  const { adminNotes } = req.body; // Alasan wajib diisi dari frontend
+  if (!adminNotes) {
+    return res.status(400).json({ error: "Alasan pembatalan wajib diisi." });
+  }
+  const updatedOrder = await prisma.order.update({
+    where: { id: parseInt(id) },
+    data: { status: "CANCELLED", adminNotes },
+  });
+  res.json(updatedOrder);
 });
 
 // Jalankan Server

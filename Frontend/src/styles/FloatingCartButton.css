@@ -1,0 +1,46 @@
+.floating-cart-btn {
+    position: fixed; /* Membuat tombol melayang relatif terhadap layar */
+    bottom: 2rem;    /* Jarak dari bawah layar */
+    right: 2rem;     /* Jarak dari kanan layar */
+    z-index: 1000;   /* Memastikan tombol selalu di atas konten lain */
+
+    width: 60px;
+    height: 60px;
+    background-color: #c0392b; /* Warna merah yang sama dengan tombol Beli */
+    color: white;
+    border-radius: 50%; /* Membuatnya menjadi lingkaran sempurna */
+    border: none;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.floating-cart-btn:hover {
+    transform: scale(1.1); /* Sedikit membesar saat disentuh mouse */
+}
+
+.cart-item-count {
+    position: absolute;
+    top: -5px;      /* Posisi badge sedikit di atas tombol */
+    right: -5px;    /* Posisi badge sedikit di kanan tombol */
+    
+    background-color: #363636; /* Warna gelap untuk kontras */
+    color: white;
+    border-radius: 50%;
+    
+    width: 24px;
+    height: 24px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 2px solid white;
+}

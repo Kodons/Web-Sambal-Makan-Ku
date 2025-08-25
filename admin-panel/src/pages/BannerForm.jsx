@@ -62,7 +62,7 @@ const BannerForm = () => {
                 const uploadData = await uploadRes.json();
                 finalImageUrl = uploadData.filePath;
             } catch (error) {
-                toast.error(error.message); // Shows the specific error message
+                toast.error(error.message);
                 setIsSubmitting(false);
                 return;
             }

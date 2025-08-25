@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaUserShield, FaUser, FaLock } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // 1. Impor komponen Link
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');

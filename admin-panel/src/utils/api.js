@@ -2,11 +2,23 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const fetchWithAuth = async (endpoint, options = {}) => {
     const token = localStorage.getItem('authToken');
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
+    
+    const defaultHeaders = {
         'Authorization': `Bearer ${token}`,
     };
+
+    if (!(options.body instanceof FormData)) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
+
+    const headers = {
+        ...defaultHeaders,
+        ...options.headers,
+    };
+
+    if (headers['Content-Type'] === null) {
+        delete headers['Content-Type'];
+    }
 
     const response = await fetch(`${BACKEND_URL}${endpoint}`, {
         ...options,

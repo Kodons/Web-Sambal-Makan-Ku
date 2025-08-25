@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSWRConfig } from 'swr';
 import toast from 'react-hot-toast';
-import { fetchWithAuth } from '../utils/api'; // Sesuaikan path
+import { fetchWithAuth } from '../utils/api';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -18,8 +18,8 @@ const OrderDetail = ({ order, onClose }) => {
                     body: JSON.stringify({ adminNotes: 'Pembayaran dikonfirmasi.' })
                 });
                 toast.success('Pesanan berhasil disetujui!');
-                mutate('/api/admin/orders'); // Refresh daftar pesanan
-                onClose(); // Tutup modal
+                mutate('/api/admin/orders');
+                onClose();
             } catch (error) {
                 toast.error('Gagal menyetujui pesanan.');
             }
@@ -35,8 +35,8 @@ const OrderDetail = ({ order, onClose }) => {
                     body: JSON.stringify({ adminNotes: reason })
                 });
                 toast.success('Pesanan berhasil dibatalkan.');
-                mutate('/api/admin/orders'); // Refresh daftar pesanan
-                onClose(); // Tutup modal
+                mutate('/api/admin/orders');
+                onClose();
             } catch (error) {
                 toast.error('Gagal membatalkan pesanan.');
             }
@@ -53,6 +53,7 @@ const OrderDetail = ({ order, onClose }) => {
                 </header>
                 <section className="modal-card-body">
                     <div className="content">
+                        <strong>SN:</strong> {order.serialNumber}<br />
                         <strong>Pelanggan:</strong> {order.customerName}<br />
                         <strong>No. HP:</strong> {order.customerPhone}<br />
                         <strong>Alamat:</strong> {order.customerAddress}<br />

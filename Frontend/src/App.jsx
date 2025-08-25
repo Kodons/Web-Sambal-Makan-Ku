@@ -17,6 +17,7 @@ import FloatingCartButton from './components/FloatingCartButton.jsx';
 import CartSidebar from './components/CartSidebar.jsx';
 import Checkout from './components/Checkout.jsx';
 import DetailOrder from './components/DetailOrder.jsx';
+import TrackOrderPage from './components/TrackOrderPage.jsx';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -82,6 +83,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/pesanan-berhasil" element={<DetailOrder />} />
+              <Route path="/lacak-pesanan" element={<TrackOrderPage />} />
             </Routes>
           </div>
 

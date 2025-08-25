@@ -13,6 +13,7 @@ const rateLimit = require("express-rate-limit");
 const sharp = require("sharp");
 const fs = require("fs");
 const compression = require("compression");
+const jsQR = require('jsqr');
 
 // =========================================================================
 //  KONFIGURASI DASAR
@@ -253,6 +254,53 @@ app.post("/api/upload-proof", upload.single("file"), async (req, res) => {
     console.error("Error saat memproses bukti bayar:", error);
     res.status(500).json({ error: "Gagal memproses gambar." });
   }
+});
+
+// --- ENDPOINT UNTUK MELACAK PESANAN ---
+app.get("/api/orders/track/:serialNumber", async (req, res) => {
+    const { serialNumber } = req.params;
+
+    try {
+        const order = await prisma.order.findUnique({
+            where: { serialNumber: serialNumber },
+            include: {
+                orderItems: {
+                    include: {
+                        product: true, // Sertakan detail produk untuk setiap item
+                    },
+                },
+            },
+        });
+
+        if (!order) {
+            return res.status(404).json({ error: "Nomor pesanan tidak ditemukan." });
+        }
+
+        // Hanya kirim data yang aman untuk ditampilkan ke publik
+        const publicOrderData = {
+            serialNumber: order.serialNumber,
+            customerName: order.customerName,
+            status: order.status,
+            adminNotes: order.adminNotes,
+            createdAt: order.createdAt,
+            totalAmount: order.totalAmount,
+            shippingCost: order.shippingCost,
+            orderItems: order.orderItems.map(item => ({
+                quantity: item.quantity,
+                price: item.price,
+                product: {
+                    name: item.product.name,
+                    imageUrl: item.product.imageUrl
+                }
+            }))
+        };
+
+        res.json(publicOrderData);
+
+    } catch (error) {
+        console.error("Error saat melacak pesanan:", error);
+        res.status(500).json({ error: "Terjadi kesalahan pada server." });
+    }
 });
 
 // --- DATA UNTUK LANDING PAGE ---
@@ -620,13 +668,54 @@ adminRouter.get("/social-media-links", async (req, res) => {
   res.json(links);
 });
 adminRouter.put("/settings", async (req, res) => {
-  const { brandName, logoImageUrl, qrisImageUrl } = req.body;
+  const { brandName, logoImageUrl } = req.body;
+
+  const dataToUpdate = {};
+  if (brandName !== undefined) dataToUpdate.brandName = brandName;
+  if (logoImageUrl !== undefined) dataToUpdate.logoImageUrl = logoImageUrl;
+
   const updatedSettings = await prisma.setting.upsert({
     where: { id: 1 },
-    update: { brandName, logoImageUrl, qrisImageUrl },
-    create: { id: 1, brandName, logoImageUrl, qrisImageUrl },
+    update: dataToUpdate,
+    create: { id: 1, ...dataToUpdate },
   });
   res.json(updatedSettings);
+});
+adminRouter.post("/settings/qris", upload.single("file"), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "Tidak ada file yang diunggah." });
+    }
+
+    try {
+        // Gunakan sharp untuk mendapatkan metadata dan data piksel mentah
+        const { data, info } = await sharp(req.file.buffer)
+            .raw()
+            .ensureAlpha() // Pastikan ada 4 channel (RGBA)
+            .toBuffer({ resolveWithObject: true });
+
+        // Buat objek yang sesuai dengan format yang dibutuhkan jsQR
+        const rawImageData = {
+            data: new Uint8ClampedArray(data),
+            width: info.width,
+            height: info.height,
+        };
+
+        const code = jsQR(rawImageData.data, rawImageData.width, rawImageData.height);
+
+        if (code && code.data) {
+            await prisma.setting.upsert({
+                where: { id: 1 },
+                update: { qrisStaticData: code.data },
+                create: { id: 1, qrisStaticData: code.data },
+            });
+            res.status(200).json({ message: 'Data QRIS berhasil dibaca dan disimpan.' });
+        } else {
+            res.status(400).json({ error: 'Gagal membaca QR code dari gambar yang diunggah. Pastikan gambar jelas.' });
+        }
+    } catch (error) {
+        console.error("Error saat memproses gambar QRIS:", error);
+        res.status(500).json({ error: "Gagal memproses gambar." });
+    }
 });
 adminRouter.post("/social-media-links", async (req, res) => {
   const { platform, url, iconName } = req.body;

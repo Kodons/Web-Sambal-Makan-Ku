@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaPepperHot, FaCartShopping } from 'react-icons/fa6';
-import { useCart } from '../context/CartContext'; // BARU: Impor hook keranjang
-import toast from 'react-hot-toast'; // BARU: Impor untuk notifikasi
+import { useCart } from '../context/CartContext';
+import toast from 'react-hot-toast';
 
 // --- Komponen ProductCard (dengan tombol) ---
 const ProductCard = ({ product, onAddToCart }) => (
@@ -59,14 +59,12 @@ const ProductCard = ({ product, onAddToCart }) => (
 );
 
 
-// --- Komponen ProdukSection (dengan logika keranjang) ---
+// --- Komponen ProdukSection ---
 const ProdukSection = () => {
     const [allProducts, setAllProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 4;
-
-    // BARU: Ambil fungsi addToCart dari CartContext
     const { addToCart } = useCart(); 
 
     useEffect(() => {
@@ -99,8 +97,8 @@ const ProdukSection = () => {
 
     // BARU: Fungsi ini sekarang memanggil context dan menampilkan notifikasi
     const handleAddToCart = (product) => {
-        addToCart(product); // Panggil fungsi dari context untuk menambah barang
-        toast.success(`${product.name} berhasil ditambahkan!`); // Tampilkan notifikasi
+        addToCart(product);
+        toast.success(`${product.name} berhasil ditambahkan!`);
     };
 
     if (isLoading) {

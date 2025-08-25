@@ -26,7 +26,7 @@ const WelcomePopup = ({ onClose, imageUrl }) => {
                 alt="Promo Sambal Juara"
                 onClick={onClose}
                 style={{ cursor: 'pointer' }}
-                width="800" // Tetap berikan width dan height
+                width="800"
                 height="533"
               />
             </figure>

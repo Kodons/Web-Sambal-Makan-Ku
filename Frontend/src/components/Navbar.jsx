@@ -5,7 +5,6 @@ import useSWR from 'swr';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
-
 const Navbar = () => {
     const [isActive, setIsActive] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -54,13 +53,14 @@ const Navbar = () => {
                 </div>
                 <div className={`navbar-menu ${isActive ? 'is-active' : ''}`}>
                     <div className="navbar-end">
-                        <a href="#tentang" className="navbar-item">Tentang Kami</a>
-                        <a href="#produk" className="navbar-item">Produk</a>
-                        <a href="#testimoni" className="navbar-item">Testimoni</a>
-                        <a href="#kontak" className="navbar-item">Kontak</a>
+                        <a href="/#tentang" className="navbar-item">Tentang Kami</a>
+                        <a href="/#produk" className="navbar-item">Produk</a>
+                        <a href="/#testimoni" className="navbar-item">Testimoni</a>
+                        <a href="/#kontak" className="navbar-item">Kontak</a>
                         <div className="navbar-item">
-                            <a href="#kontak" className="button is-danger is-rounded has-text-weight-bold">
-                                <strong>Pesan Sekarang</strong>
+                            {/* --- PERUBAHAN DI SINI --- */}
+                            <a href="/lacak-pesanan" className="button is-danger is-rounded has-text-weight-bold">
+                                <strong>Lacak Pesanan</strong>
                             </a>
                         </div>
                     </div>

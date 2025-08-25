@@ -5,6 +5,8 @@ import { FaSearch } from 'react-icons/fa';
 import { FaPepperHot } from 'react-icons/fa6';
 import Pagination from '../components/Pagination';
 import { fetchWithAuth } from '../utils/api';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 function useDebounce(value, delay) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -20,6 +22,7 @@ function useDebounce(value, delay) {
 }
 
 const ProductList = () => {
+    const MySwal = withReactContent(Swal);
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,18 +50,28 @@ const ProductList = () => {
         }
     }, [isLoading]);
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Anda yakin ingin menghapus produk ini?')) {
-            try {
-                await fetchWithAuth(`/api/admin/produk/${id}`, { method: 'DELETE' });
-                toast.success('Produk berhasil dihapus!');
-                const response = await fetchWithAuth(`/api/admin/produk?page=${currentPage}&limit=${productsPerPage}&search=${debouncedSearchTerm}`);
-                setProducts(response.data);
-                setTotalPages(Math.ceil(response.total / productsPerPage));
-            } catch (error) {
-                toast.error(error.message);
+    const handleDelete = (id) => {
+        MySwal.fire({
+            title: 'Anda Yakin?',
+            text: "Produk yang sudah dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetchWithAuth(`/api/admin/produk/${id}`, { method: 'DELETE' })
+                    .then(() => {
+                        toast.success('Produk berhasil dihapus!');
+                        setProducts(prevProducts => prevProducts.filter(product => product.id !== id));
+                    })
+                    .catch(error => {
+                        toast.error(error.message);
+                    });
             }
-        }
+        });
     };
 
     if (isLoading && products.length === 0) {

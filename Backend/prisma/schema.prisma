@@ -23,6 +23,7 @@ model Setting {
   brandName    String? @default("Sambal Juara")
   logoImageUrl String? @db.VarChar(255)
   qrisStaticData String? @db.Text
+  mapEmbedUrl    String? @db.Text
 }
 
 model SocialMediaLink {

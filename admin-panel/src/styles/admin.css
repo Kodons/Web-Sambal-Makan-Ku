@@ -91,3 +91,7 @@ body, .admin-body {
 .button.is-info {
     background-color: #3182ce;
 }
+/* Mencegah layout bergeser saat SweetAlert2 aktif */
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+  padding-right: 0px !important;
+}

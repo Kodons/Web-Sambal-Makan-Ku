@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaUserShield, FaUser, FaLock } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,6 +24,7 @@ const LoginPage = () => {
             localStorage.setItem('authToken', data.token);
             window.location.href = '/produk';
             toast.success('Login berhasil!');
+            navigate('/produk'); 
         } catch (error) {
             toast.error(error.message);
         } finally {

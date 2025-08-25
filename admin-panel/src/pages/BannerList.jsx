@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { fetchWithAuth } from '../utils/api';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const BannerList = () => {
+    const MySwal = withReactContent(Swal);
     const [banners, setBanners] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -18,16 +21,28 @@ const BannerList = () => {
             .finally(() => setIsLoading(false));
     }, []);
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Anda yakin ingin menghapus banner ini?')) {
-            try {
-                await fetchWithAuth(`/api/admin/banners/${id}`, { method: 'DELETE' });
-                setBanners(banners.filter(b => b.id !== id));
-                toast.success('Banner berhasil dihapus!');
-            } catch (error) {
-                toast.error(error.message);
+    const handleDelete = (id) => {
+        MySwal.fire({
+            title: 'Anda Yakin?',
+            text: "Banner yang sudah dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetchWithAuth(`/api/admin/banners/${id}`, { method: 'DELETE' })
+                    .then(() => {
+                        toast.success('Banner berhasil dihapus!');
+                        setBanners(prevBanners => prevBanners.filter(banners => banners.id !== id));
+                    })
+                    .catch(error => {
+                        toast.error(error.message);
+                    });
             }
-        }
+        });
     };
 
     return (

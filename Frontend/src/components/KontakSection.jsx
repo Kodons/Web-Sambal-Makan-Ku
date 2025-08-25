@@ -13,6 +13,11 @@ const KontakSection = () => {
         fetcher
     );
 
+    const { data: settings } = useSWR(
+        `${import.meta.env.VITE_BACKEND_URL}/api/settings`,
+        fetcher
+    );
+
     const whatsappLink = socialLinks.find(link => link.platform === 'WhatsApp');
     const instagramLink = socialLinks.find(link => link.platform === 'Instagram');
 
@@ -50,12 +55,18 @@ const KontakSection = () => {
                             transition={{ duration: 0.8 }}
                         >
                             <figure className="image is-16by9">
-                                <iframe
-                                    className="has-ratio"
-                                    width="100%" height="450" style={{ border: 0, borderRadius: '8px' }}
-                                    loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade"
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3944.829462876395!2d116.09329287589532!3d-8.612366191433292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dcdbf0c199bca5d%3A0x21f1ee0ab70d17ad!2sJl.%20Sunan%20Drajat%20III%2C%20Jempong%20Baru%2C%20Kec.%20Sekarbela%2C%20Kota%20Mataram%2C%20Nusa%20Tenggara%20Bar.%2083116!5e0!3m2!1sid!2sid!4v1755139064674!5m2!1sid!2sid"
-                                ></iframe>
+                                {settings && settings.mapEmbedUrl ? (
+                                    <iframe
+                                        className="has-ratio"
+                                        width="100%" height="450" style={{ border: 0, borderRadius: '8px' }}
+                                        loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade"
+                                        src={settings.mapEmbedUrl.match(/src="([^"]+)"/)[1]}
+                                    ></iframe>
+                                ) : (
+                                    <div className="has-text-centered">
+                                        <p>Peta lokasi belum diatur oleh admin.</p>
+                                    </div>
+                                )}
                             </figure>
                         </motion.div>
                     </div>

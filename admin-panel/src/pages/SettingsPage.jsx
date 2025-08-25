@@ -15,6 +15,7 @@ const SettingsPage = () => {
     // State untuk Branding
     const [brandName, setBrandName] = useState('');
     const [logoImageUrl, setLogoImageUrl] = useState('');
+    const [mapEmbedUrl, setMapEmbedUrl] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [isBrandingSubmitting, setIsBrandingSubmitting] = useState(false);
@@ -36,6 +37,7 @@ const SettingsPage = () => {
             setBrandName(settings.brandName || '');
             setLogoImageUrl(settings.logoImageUrl || '');
             setHasQrisData(!!settings.qrisStaticData);
+            setMapEmbedUrl(settings.mapEmbedUrl || '');
         }
     }, [settings]);
 
@@ -95,9 +97,9 @@ const SettingsPage = () => {
         try {
             await fetchWithAuth('/api/admin/settings', {
                 method: 'PUT',
-                body: JSON.stringify({ brandName, logoImageUrl: finalImageUrl }),
+                body: JSON.stringify({ brandName, logoImageUrl: finalImageUrl, mapEmbedUrl }),
             });
-            toast.success('Pengaturan branding berhasil disimpan!');
+            toast.success('Pengaturan branding & peta berhasil disimpan!');
             mutate('/api/admin/settings');
         } catch (error) {
             toast.error('Gagal menyimpan pengaturan branding.');
@@ -224,6 +226,20 @@ const SettingsPage = () => {
                                 </div>
                             </div>
                             <button type="submit" className={`button is-info ${isBrandingSubmitting ? 'is-loading' : ''}`} disabled={isBrandingSubmitting}>Simpan Branding</button>
+                            <div className="field mt-3">
+                                <label className="label">URL Google Maps Embed</label>
+                                <div className="control">
+                                    <textarea
+                                        className="textarea"
+                                        placeholder="Paste kode <iframe...> dari Google Maps di sini"
+                                        value={mapEmbedUrl}
+                                        onChange={(e) => setMapEmbedUrl(e.target.value)}
+                                    ></textarea>
+                                </div>
+                                <p className="help">Buka Google Maps ~ Cari ~ lokasi ~ Bagikan ~ Sematkan peta ~ Salin HTML.</p>
+                            </div>
+
+                            <button type="submit" className={`button is-info ${isBrandingSubmitting ? 'is-loading' : ''}`} disabled={isBrandingSubmitting}>Simpan Branding & Peta</button>
                         </form>
                     </div>
                 </div>

@@ -18,6 +18,7 @@ import CartSidebar from './components/CartSidebar.jsx';
 import Checkout from './components/Checkout.jsx';
 import DetailOrder from './components/DetailOrder.jsx';
 import TrackOrderPage from './components/TrackOrderPage.jsx';
+import Meta from './components/Meta.jsx';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -67,6 +68,7 @@ function App() {
     <CartProvider>
       {/* 1. Bungkus semua dengan Router */}
       <Router>
+        <Meta />
         <div className='page-wrapper'>
           <Toaster position="bottom-center" />
 

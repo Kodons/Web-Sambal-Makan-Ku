@@ -24,10 +24,22 @@ const PORT = 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // --- MIDDLEWARE ---
-app.use(cors());
+const whitelist = ['http://localhost:5173', 'http://localhost:5174']; // URL untuk development
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Izinkan jika domain ada di whitelist atau jika origin tidak ada (misal: request dari Postman)
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Tidak diizinkan oleh CORS'));
+    }
+  }
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(compression());
+app.disable('x-powered-by');
 
 // --- KONFIGURASI UPLOAD (MULTER) ---
 const storage = multer.memoryStorage();
@@ -668,11 +680,12 @@ adminRouter.get("/social-media-links", async (req, res) => {
   res.json(links);
 });
 adminRouter.put("/settings", async (req, res) => {
-  const { brandName, logoImageUrl } = req.body;
+  const { brandName, logoImageUrl, mapEmbedUrl  } = req.body;
 
   const dataToUpdate = {};
   if (brandName !== undefined) dataToUpdate.brandName = brandName;
   if (logoImageUrl !== undefined) dataToUpdate.logoImageUrl = logoImageUrl;
+  if (mapEmbedUrl !== undefined) dataToUpdate.mapEmbedUrl = mapEmbedUrl;
 
   const updatedSettings = await prisma.setting.upsert({
     where: { id: 1 },

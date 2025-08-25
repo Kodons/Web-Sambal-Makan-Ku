@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import 'bulma/css/bulma.min.css';
 import { Toaster } from 'react-hot-toast';
+import 'sweetalert2/src/sweetalert2.scss';
 import './styles/admin.css';
 import './styles/login.css';
 

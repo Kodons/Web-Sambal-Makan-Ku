@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../components/Pagination';
 import { fetchWithAuth } from '../utils/api';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 function useDebounce(value, delay) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -19,6 +21,7 @@ function useDebounce(value, delay) {
 }
 
 const TestimoniList = () => {
+    const MySwal = withReactContent(Swal);
     const [testimonis, setTestimonis] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -46,19 +49,28 @@ const TestimoniList = () => {
         }
     }, [isLoading]);
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Anda yakin ingin menghapus testimoni ini?')) {
-            try {
-                await fetchWithAuth(`/api/admin/testimoni/${id}`, { method: 'DELETE' });
-                toast.success('Testimoni berhasil dihapus!');
-                // Muat ulang data
-                const response = await fetchWithAuth(`/api/admin/testimoni?page=${currentPage}&limit=${testimonialsPerPage}&search=${debouncedSearchTerm}`);
-                setTestimonis(response.data);
-                setTotalPages(Math.ceil(response.total / testimonialsPerPage));
-            } catch (error) {
-                toast.error(error.message);
+    const handleDelete = (id) => {
+        MySwal.fire({
+            title: 'Anda Yakin?',
+            text: "Testimoni yang sudah dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetchWithAuth(`/api/admin/testimoni/${id}`, { method: 'DELETE' })
+                    .then(() => {
+                        toast.success('Testimoni berhasil dihapus!');
+                        setTestimonis(prevTestimonis => prevTestimonis.filter(testimonis => testimonis.id !== id));
+                    })
+                    .catch(error => {
+                        toast.error(error.message);
+                    });
             }
-        }
+        });
     };
 
     if (isLoading && testimonis.length === 0) {

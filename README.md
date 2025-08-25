@@ -18,18 +18,18 @@ Selamat datang di repositori "Sambal Teman Makan Ku"! Ini adalah proyek aplikasi
 - **Desain Modern & Responsif**: Tampilan yang menyesuaikan di berbagai perangkat, dari desktop hingga mobile.
 - **Konten Dinamis**: Semua konten (produk, testimoni, banner, logo, link sosmed) diambil langsung dari database melalui API.
 - **Animasi Interaktif**: Menggunakan Framer Motion untuk animasi yang halus dan Swiper.js untuk slider testimoni.
-- **Sistem Keranjang Belanja: Pelanggan dapat menambahkan produk ke keranjang yang persisten
-- **Sistem Checkout Otomatis: Alur checkout multi-langkah
-- **Pembayaran QRIS Dinamis: QRIS dinamis dengan nominal terisi otomatis
-- **Pelacakan Pesanan: Halaman khusus untuk melacak status pesanan
+- **Sistem Keranjang Belanja**: Pelanggan dapat menambahkan produk ke keranjang yang persisten.
+- **Sistem Checkout Otomatis**: Alur checkout multi-langkah.
+- **Pembayaran QRIS Dinamis**: QRIS dinamis dengan nominal terisi otomatis.
+- **Pelacakan Pesanan**: Halaman khusus untuk melacak status pesanan.
 - **Pop-up Promosi**: Banner promosi yang kontennya bisa diatur oleh admin.
 
 #### Admin Panel
 - **Otentikasi Aman**: Sistem login berbasis JWT (JSON Web Token) untuk melindungi semua halaman admin.
 - **Keamanan:** Halaman admin diproteksi dengan sistem login berbasis JWT (JSON Web Token) dan memiliki fitur "Lupa Password" via email.
 - **Manajemen Konten (CRUD)**: Fungsionalitas penuh untuk Create, Read, Update, dan Delete data.
-- **Manajemen Pesanan: Melihat, mencari, menyetujui, atau membatalkan pesanan
-- **Pengaturan Pembayaran: Unggah gambar QRIS statis untuk sistem pembayaran dinamis
+- **Manajemen Pesanan**: Melihat, mencari, menyetujui, atau membatalkan pesanan.
+- **Pengaturan Pembayaran**: Unggah gambar QRIS statis untuk sistem pembayaran dinamis.
 - **Pengelolaan Dinamis**: Mengelola Produk, Testimoni, Banner Promosi, dan Pengaturan Website.
 - **Upload Gambar**: Fitur upload gambar yang mudah digunakan dengan *preview* instan.
 
@@ -37,7 +37,7 @@ Selamat datang di repositori "Sambal Teman Makan Ku"! Ini adalah proyek aplikasi
 - **REST API**: Dibangun dengan Node.js dan Express.js, dengan pemisahan rute publik dan rute admin yang aman.
 - **ORM Modern**: Menggunakan Prisma untuk interaksi yang aman dan efisien dengan database.
 - **Database**: Terhubung dengan MySQL.
-- **Optimasi Gambar: Mengompresi dan mengubah format gambar menjadi .webp
+- **Optimasi Gambar**: Mengompresi dan mengubah format gambar menjadi .webp
 - **Keamanan**: Menggunakan `bcryptjs` dan `jsonwebtoken`.
 
 ---
